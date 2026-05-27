@@ -1,0 +1,12 @@
+# Thư viện core
+manim>=0.18.0
+numpy
+scipy
+
+# Các thư viện hỗ trợ định dạng ảnh và video
+Pillow
+opencv-python
+
+# Tùy chọn
+jupyterlab
+notebook
