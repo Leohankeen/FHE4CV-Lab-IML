@@ -1,0 +1,30 @@
+{
+  "name": "trained_xray_linear_triage",
+  "feature_names": [
+    "mean_intensity",
+    "std_intensity",
+    "upper_left_mean",
+    "upper_right_mean",
+    "lower_left_mean",
+    "lower_right_mean",
+    "center_mean",
+    "edge_energy",
+    "bright_ratio",
+    "dark_ratio"
+  ],
+  "weights": [
+    -2.6681,
+    15.134958,
+    -4.246837,
+    -4.278665,
+    0.944308,
+    1.227178,
+    -4.547315,
+    -70.879245,
+    -0.111812,
+    10.47148
+  ],
+  "bias": 5.64942,
+  "threshold": 0.5,
+  "description": "Plaintext logistic-regression model exported for TenSEAL encrypted scoring from deterministic demo labels. Not validated for clinical use."
+}

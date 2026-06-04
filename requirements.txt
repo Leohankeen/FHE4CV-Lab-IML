@@ -10,3 +10,16 @@ opencv-python
 # Tùy chọn
 jupyterlab
 notebook
+pytest
+
+# Machine learning & utilities
+torch>=2.0.0
+torchvision>=0.15.0
+scikit-image
+scikit-learn
+pandas
+matplotlib
+tqdm
+
+# Homomorphic encryption (TenSEAL - CKKS)
+tenseal
