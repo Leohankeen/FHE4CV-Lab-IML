@@ -26,6 +26,11 @@ phù hợp với demo, notebook và Manim.
   thời gian mã hóa, encrypted dot product, giải mã, sai số CKKS.
 - [scripts/train_plaintext_linear_model.py](scripts/train_plaintext_linear_model.py):
   train/export logistic-regression model plaintext sang JSON dùng cho FHE demo.
+- [scripts/storyboards/02_fhe_cnn/](scripts/storyboards/02_fhe_cnn):
+  storyboard Act 2 cho phần FHE-friendly CNN, gồm lời thoại, visual actions và
+  mapping audio.
+- [scripts/render_act2_fhe_cnn.ps1](scripts/render_act2_fhe_cnn.ps1):
+  render batch 4 scene Manim của Act 2.
 - [models/triage_linear_model.json](models/triage_linear_model.json): model
   artifact mặc định, dễ giải thích, gồm feature order, weights, bias, threshold.
 - [models/triage_linear_model_trained_demo.json](models/triage_linear_model_trained_demo.json):
@@ -36,6 +41,9 @@ phù hợp với demo, notebook và Manim.
   scene Manim giải thích luồng bảo mật.
 - [scenes/fhe4cv_full_explainer.py](scenes/fhe4cv_full_explainer.py):
   scene Manim dài hơn cho video thuyết trình hoàn chỉnh.
+- [scenes/02_fhe_cnn/](scenes/02_fhe_cnn):
+  4 scene Manim về ReLU barrier, polynomial approximation, naive CNN
+  bottleneck và multiplexed parallel convolutions.
 - [docs/project_report_vi.md](docs/project_report_vi.md): báo cáo kỹ thuật
   tiếng Việt cho phần thuyết trình/nộp bài.
 - [docs/labels_format.md](docs/labels_format.md): định dạng CSV nhãn cho
@@ -73,6 +81,15 @@ pip install -r requirements.txt
 Ghi chú cho Manim trên Windows:
 - Nên dùng Python 3.11 hoặc 3.12. Virtualenv Python 3.13 có thể lỗi khi Manim
   import Pydub vì `audioop` đã bị loại khỏi standard library.
+- Nếu đã dùng Python 3.13 và gặp lỗi `No module named 'audioop'` hoặc
+  `No module named 'pyaudioop'`, chạy:
+
+```powershell
+python -m pip install audioop-lts
+```
+
+  Dependency này cũng đã được thêm vào `requirements.txt` với marker cho
+  Python 3.13.
 - Nếu render bị lỗi encoding config trên Windows, đảm bảo `configs/manim.cfg`
   chỉ chứa comment ASCII như file hiện tại.
 
@@ -150,6 +167,26 @@ manim -c configs/manim.cfg -pql scenes/medical_fhe_pipeline_scene.py MedicalFHEP
 manim -c configs/manim.cfg -pql scenes/fhe4cv_full_explainer.py FHE4CVFullExplainer
 ```
 
+- Render Act 2 về FHE-friendly CNN:
+
+```powershell
+.\scripts\render_act2_fhe_cnn.ps1
+```
+
+Script luôn render nội dung đầy đủ theo storyboard, tổng thời lượng khoảng
+70 phút: 15 phút cho scene 1, 20 phút cho scene 2, 10 phút cho scene 3 và
+25 phút cho scene 4. Mỗi phân đoạn gồm visual demonstration và nhiều content
+beats; thời lượng không được tạo bằng cách giữ một khung hình tĩnh.
+
+- Render từng scene Act 2 riêng:
+
+```powershell
+python -m manim -c configs/manim.cfg -ql scenes/02_fhe_cnn/scene_01_relu_barrier.py ReLuBarrier
+python -m manim -c configs/manim.cfg -ql scenes/02_fhe_cnn/scene_02_polynomial_approx.py PolynomialApproximation
+python -m manim -c configs/manim.cfg -ql scenes/02_fhe_cnn/scene_03_naive_cnn_bottleneck.py NaiveCNNBottleneck
+python -m manim -c configs/manim.cfg -ql scenes/02_fhe_cnn/scene_04_multiplexed_conv.py MultiplexedPacking
+```
+
 - Render chất lượng cao:
 
 ```powershell
@@ -214,6 +251,10 @@ Sau khi render Manim, video nằm ở:
 
 - `media/videos/medical_fhe_pipeline_scene/480p15/MedicalFHEPipeline.mp4`
 - `media/videos/fhe4cv_full_explainer/480p15/FHE4CVFullExplainer.mp4`
+- `media/videos/scene_01_relu_barrier/480p15/ReLuBarrier.mp4`
+- `media/videos/scene_02_polynomial_approx/480p15/PolynomialApproximation.mp4`
+- `media/videos/scene_03_naive_cnn_bottleneck/480p15/NaiveCNNBottleneck.mp4`
+- `media/videos/scene_04_multiplexed_conv/480p15/MultiplexedPacking.mp4`
 
 ## Kịch bản thuyết trình Manim
 
@@ -234,9 +275,27 @@ Scene `FHE4CVFullExplainer` phù hợp hơn cho video dài, gồm:
 3. pipeline TenSEAL/CKKS;
 4. kết quả demo và giới hạn hiện tại.
 
+Act 2 trong `scenes/02_fhe_cnn/` mở rộng phần CNN trên FHE:
+
+1. `ReLuBarrier`: vì sao ReLU/max cần so sánh và không tương thích trực tiếp
+   với ciphertext CKKS;
+2. `PolynomialApproximation`: thay ReLU bằng đa thức, trade-off giữa sai số và
+   multiplicative depth, cùng ý tưởng imaginary-removing bootstrapping;
+3. `NaiveCNNBottleneck`: minh họa lãng phí SIMD slot và nghẽn cổ chai
+   bootstrapping khi dịch CNN theo cách ngây thơ;
+4. `MultiplexedPacking`: minh họa multiplexed packing, giảm ciphertext
+   rotations và dòng dữ liệu qua ResNet block.
+
+Nếu có file audio TTS tương ứng trong `assets/audio/`, các scene Act 2 sẽ tự
+gắn âm thanh bằng `self.add_sound(...)`; nếu chưa có audio, scene vẫn render
+bình thường.
+
+Các khung thời gian trong storyboard là thời lượng mặc định của scene. Nội dung
+được chia thành các visual demonstration, walkthrough, giải thích kỹ thuật,
+ví dụ và recap riêng thay vì kéo dài một khung hình tĩnh.
+
 ## Nguồn tham chiếu
 
 - FHE4CV CVPR 2025 tutorial: https://fhe4cv.github.io/
 - TenSEAL: https://github.com/OpenMined/TenSEAL
 - Microsoft SEAL: https://github.com/microsoft/SEAL
-

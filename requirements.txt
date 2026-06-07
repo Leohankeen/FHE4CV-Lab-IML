@@ -6,6 +6,7 @@ scipy
 # Các thư viện hỗ trợ định dạng ảnh và video
 Pillow
 opencv-python
+audioop-lts; python_version >= "3.13"
 
 # Tùy chọn
 jupyterlab

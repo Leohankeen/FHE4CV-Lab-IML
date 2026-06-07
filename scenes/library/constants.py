@@ -1,12 +1,11 @@
 from manim import *
 
-# Bảng màu chủ đạo 
+
 COLOR_PLAINTEXT = BLUE_C
 COLOR_CIPHERTEXT = RED_C
 COLOR_NOISE = GREY_B
 COLOR_ENCRYPTION = YELLOW_D
 COLOR_MATH = WHITE
 
-# Các thông số thiết kế mặc định
 DEFAULT_STROKE_WIDTH = 2
 DEFAULT_FONT_SIZE = 36
