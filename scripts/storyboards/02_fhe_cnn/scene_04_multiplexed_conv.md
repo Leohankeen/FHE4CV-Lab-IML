@@ -36,3 +36,10 @@
 ## III. QUẢN LÝ TÀI NGUYÊN BỔ TRỢ (ASSETS MAPPING)
 - Audio gốc: `assets/audio/act2_scene04_mpcnn_speedup.mp3`
 - Tài liệu tham khảo lý thuyết: Toàn bộ cấu trúc toán học của Table 6 và Hình 9 trong file "lee22e.pdf".
+- Tài liệu tham khảo lý thuyết: Toàn bộ cấu trúc toán học của Table 6 và Hình 9 trong file "lee22e.pdf".
+
+## IV. EXPANDED CONTENT BEATS CHO BẢN 25 PHÚT
+- Phân đoạn 4.1: tensor dimensions, flatten order, channel multiplexing, boundary masks, weight encoding, packed outputs và resource equation.
+- Phân đoạn 4.2: rotation semantics, automorphism/key switching, redundant channel shifts, interlocking layout, masks/accumulation, operation counting và mức giảm 62%.
+- Phân đoạn 4.3: residual paths, level planning, bootstrap schedule, imaginary removal, ResNet-20, ResNet-110, security parameters và kết quả speedup tổng hợp.
+- Hai phân đoạn đầu gồm bảy content beats; phân đoạn ResNet gồm tám content beats, bên cạnh visual demonstration chính.

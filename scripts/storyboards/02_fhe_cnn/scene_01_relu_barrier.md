@@ -36,3 +36,10 @@
 ## III. QUẢN LÝ TÀI NGUYÊN BỔ TRỢ (ASSETS MAPPING)
 - Audio gốc: `assets/audio/act2_scene01_relu_barrier.mp3`
 - Tài liệu tham khảo cấu trúc: slide "From Pytorch Models to SEAL FHE" (Trang rào cản tính toán).
+- Tài liệu tham khảo cấu trúc: slide "From Pytorch Models to SEAL FHE" (Trang rào cản tính toán).
+
+## IV. EXPANDED CONTENT BEATS CHO BẢN 15 PHÚT
+- Phân đoạn 1.1: cấu trúc Conv-Bias-ReLU, ví dụ kernel 3x3, feature maps, giới hạn của chuỗi lớp tuyến tính, vai trò của góc gãy ReLU.
+- Phân đoạn 1.2: biểu diễn ciphertext polynomial, SIMD slots, phép cộng, phép nhân, rescaling, modulus chain và giới hạn instruction set.
+- Phân đoạn 1.3: max như một phép so sánh ẩn, branching trên dữ liệu mã hóa, chi phí secure comparison, round-trip decryption và kết luận thiết kế FHE-friendly.
+- Mỗi phân đoạn gồm một visual demonstration và năm content beats thay đổi liên tục; không dùng một khung hình tĩnh để lấp thời lượng.
