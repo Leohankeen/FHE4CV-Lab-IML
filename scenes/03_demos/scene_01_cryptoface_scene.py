@@ -34,7 +34,7 @@ class CryptoFace(StoryboardScene):
         # ==================================================
         
         # Tiêu đề Act 3
-        self.add_sound("./assets/audio/03_demos/03_01_1.mp3")
+        self.add_sound("./assets/audio/03_demos/01_01_1.mp3")
         title_act3 = Text("Act 3: Practical FHE Applications\nCryptoFace System", font_size=36, color=WHITE, line_spacing=0.8)
         self.play(Write(title_act3))
         self.wait(21)
@@ -48,7 +48,7 @@ class CryptoFace(StoryboardScene):
         
         self.play(FadeIn(user_node, user_lbl, cloud_node, cloud_lbl))
 
-        self.add_sound("./assets/audio/03_demos/03_01_2.mp3")
+        self.add_sound("./assets/audio/03_demos/01_01_2.mp3")
         self.wait(5)
         # Gửi ảnh rõ lên đám mây và bị tấn công
         plain_data = PlaintextBlock(label_text="Plaintext Face").scale(0.5).move_to(user_node)
@@ -60,7 +60,7 @@ class CryptoFace(StoryboardScene):
         
         # Chuyển giao sang giải pháp FHE (Mã hóa đầu cuối)
         self.play(FadeOut(plain_data), FadeOut(hacker_lbl), cloud_node.animate.set_color(WHITE))
-        self.add_sound("./assets/audio/03_demos/03_01_3.mp3")
+        self.add_sound("./assets/audio/03_demos/01_01_3.mp3")
         self.wait(5)
 
         lock_box = CiphertextBlock(label_text="🔒 Ciphertext").scale(0.5).move_to(user_node)
@@ -80,7 +80,7 @@ class CryptoFace(StoryboardScene):
         
         depth_title = Text("Challenge: Multiplicative Depth", font_size=24, color=RED).move_to(UP * 3)
         self.play(Write(depth_title))
-        self.add_sound("./assets/audio/03_demos/03_02_1.mp3")
+        self.add_sound("./assets/audio/03_demos/01_02_1.mp3")
         # Vẽ mạng CNN quá sâu gây nhiễu sụp đổ
         deep_cnn = VGroup(*[ResNetBlock(label_text="").scale(0.5) for _ in range(4)]).arrange(RIGHT, buff=0.3).move_to(DOWN * 0.5)
         self.play(FadeIn(deep_cnn))
@@ -89,7 +89,7 @@ class CryptoFace(StoryboardScene):
         self.play(Write(noise_text))
         self.wait(30)
         self.play(FadeOut(deep_cnn), FadeOut(noise_text), FadeOut(depth_title))
-        self.add_sound("./assets/audio/03_demos/03_02_2.mp3")
+        self.add_sound("./assets/audio/03_demos/01_02_2.mp3")
         # Giải pháp: Patch-based CNN (Chia nhỏ ảnh)
         patch_title = Text("CryptoFaceNet Solution: Patch-based Processing", font_size=24, color=GREEN).move_to(UP * 3)
         self.play(Write(patch_title))
@@ -105,7 +105,7 @@ class CryptoFace(StoryboardScene):
         grid_lbl = Text("Face divided into discrete patches", font_size=16).next_to(grid_patches, DOWN)
         self.play(FadeIn(grid_patches), Write(grid_lbl))
         self.wait(13)
-        self.add_sound("./assets/audio/03_demos/03_02_3.mp3")
+        self.add_sound("./assets/audio/03_demos/01_02_3.mp3")
         # Các mảnh nhỏ xử lý song song bởi nhiều PCNN nông
         pcnns = VGroup(*[ResNetBlock(label_text="PCNN").scale(0.4) for _ in range(3)]).arrange(DOWN, buff=0.2).move_to(RIGHT * 3)
         self.play(FadeIn(pcnns))
@@ -140,10 +140,10 @@ class CryptoFace(StoryboardScene):
         # ==================================================
         # 📍 PHÂN ĐOẠN 3: LUỒNG ĐĂNG KÝ - ENROLLMENT (7:30 - 11:30)
         # ==================================================
-        self.add_sound("./assets/audio/03_demos/03_03_1.mp3")
+        self.add_sound("./assets/audio/03_demos/01_03_1.mp3")
         self.wait(17)
         # 1. Khởi tạo ảnh và ID tại Client
-        self.add_sound("./assets/audio/03_demos/03_03_2.mp3")
+        self.add_sound("./assets/audio/03_demos/01_03_2.mp3")
         ref_face = self.get_face_image("./assets/reference_face.jpg", scale_height=1.4).move_to(LEFT * 5.5 + UP * 2.3)
         ref_label = Text("reference face", font_size=18, color=BLACK).next_to(ref_face, DOWN, buff=0.1)
         id_block = PlaintextBlock(label_text="identity ID").scale(0.5).next_to(ref_label, DOWN, buff=0.1)
@@ -162,7 +162,7 @@ class CryptoFace(StoryboardScene):
         lock1 = Text("🔒", font_size=24).move_to(enc_face.get_corner(DR) + LEFT*0.1 + UP*0.1)
         self.play(GrowArrow(Arrow(enc_box.get_right(), enc_face.get_left(), buff=0.1, color=BLACK)), FadeIn(enc_face), FadeIn(lock1))
         self.wait(10)
-        self.add_sound("./assets/audio/03_demos/03_03_3.mp3")
+        self.add_sound("./assets/audio/03_demos/01_03_3.mp3")
         # 3. Đẩy Ciphertext sang kiến trúc Server thông qua mạng nơ-ron PCNN nông
         nn1 = ResNetBlock(label_text="").scale(0.8).move_to(RIGHT * 1.8 + UP * 2.3)
         self.play(GrowArrow(Arrow(enc_face.get_right(), nn1.get_left(), buff=0.1, color=BLACK)), FadeIn(nn1))
@@ -182,7 +182,7 @@ class CryptoFace(StoryboardScene):
         # ==================================================
         # 📍 PHÂN ĐOẠN 4: LUỒNG XÁC THỰC - VERIFICATION (11:30 - 15:00)
         # ==================================================
-        self.add_sound("./assets/audio/03_demos/03_04_1.mp3")
+        self.add_sound("./assets/audio/03_demos/01_04_1.mp3")
         # 1. Khởi tạo dữ liệu kiểm tra đầu vào tại Client góc dưới
         claimed_block = PlaintextBlock(label_text="claimed ID").scale(0.5).move_to(LEFT * 5.5 + DOWN * 0.3)
         probe_face = self.get_face_image("./assets/probe_face.jpg", scale_height=1.4).move_to(LEFT * 5.5 + DOWN * 1.8)
@@ -202,7 +202,7 @@ class CryptoFace(StoryboardScene):
         self.play(GrowArrow(Arrow(enc2.get_right(), enc_probe.get_left(), buff=0.1, color=BLACK)), FadeIn(enc_probe), FadeIn(lock2))
         self.wait(7)
         # 3. Client thực hiện gửi song song Claimed ID kích hoạt Database xử lý
-        self.add_sound("./assets/audio/03_demos/03_04_2.mp3")
+        self.add_sound("./assets/audio/03_demos/01_04_2.mp3")
         db2 = db.copy().move_to(RIGHT * 5.8 + DOWN * 1.8)
         self.play(FadeIn(db2))
         cid_arrow = Arrow(claimed_block.get_right(), db2.get_top() + UP*0.2, path_arc=-0.2, color=ORANGE, stroke_width=4)
@@ -219,7 +219,7 @@ class CryptoFace(StoryboardScene):
         ref_vec_db = ref_vec.copy().move_to(RIGHT * 4.2 + DOWN * 1.8)
         self.play(GrowArrow(Arrow(db2.get_left(), ref_vec_db.get_right(), buff=0.1, color=ORANGE)), FadeIn(ref_vec_db))
         self.wait(9)
-        self.add_sound("./assets/audio/03_demos/03_04_3.mp3")
+        self.add_sound("./assets/audio/03_demos/01_04_3.mp3")
         # 6. Đưa song song 2 vector tính toán sai biệt khoảng cách ra hộp Score mã hóa
         score_box = Rectangle(width=1.2, height=0.4, color=BLACK).move_to(RIGHT * 3.85 + DOWN * 2.8)
         score_text = Text("score", font_size=16, color=BLACK).move_to(score_box)
@@ -236,7 +236,7 @@ class CryptoFace(StoryboardScene):
         self.wait(14)
 
         # 8. Trả hộp kết quả bảo mật về phía Client để thực thi giải mã
-        self.add_sound("./assets/audio/03_demos/03_04_4.mp3")
+        self.add_sound("./assets/audio/03_demos/01_04_4.mp3")
         dec_box = RoundedRectangle(corner_radius=0.1, width=1.6, height=0.7, fill_color=GREEN_C, fill_opacity=1, color=BLACK).move_to(LEFT * 2.5 + DOWN * 3.4)
         dec_text = Text("Decrypt", font_size=20, color=BLACK).move_to(dec_box)
         secret_key = Text("🗝️ Secret Key", font_size=16, color=RED_C).next_to(dec_box, UP, buff=0.1)
