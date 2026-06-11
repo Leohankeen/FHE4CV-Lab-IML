@@ -144,7 +144,7 @@ class CryptoFace(StoryboardScene):
         self.wait(17)
         # 1. Khởi tạo ảnh và ID tại Client
         self.add_sound("./assets/audio/03_demos/03_03_2.mp3")
-        ref_face = self.get_face_image("./assets/reference_face.jpg", scale_height=1.4).move_to(LEFT * 5.5 + UP * 2.3)
+        ref_face = self.get_face_image("./assets/image/03_demos/reference_face.jpg", scale_height=1.4).move_to(LEFT * 5.5 + UP * 2.3)
         ref_label = Text("reference face", font_size=18, color=BLACK).next_to(ref_face, DOWN, buff=0.1)
         id_block = PlaintextBlock(label_text="identity ID").scale(0.5).next_to(ref_label, DOWN, buff=0.1)
         self.play(FadeIn(ref_face), Write(ref_label), FadeIn(id_block))
@@ -185,7 +185,7 @@ class CryptoFace(StoryboardScene):
         self.add_sound("./assets/audio/03_demos/03_04_1.mp3")
         # 1. Khởi tạo dữ liệu kiểm tra đầu vào tại Client góc dưới
         claimed_block = PlaintextBlock(label_text="claimed ID").scale(0.5).move_to(LEFT * 5.5 + DOWN * 0.3)
-        probe_face = self.get_face_image("./assets/probe_face.jpg", scale_height=1.4).move_to(LEFT * 5.5 + DOWN * 1.8)
+        probe_face = self.get_face_image("./assets/image/03_demos/probe_face.jpg", scale_height=1.4).move_to(LEFT * 5.5 + DOWN * 1.8)
         probe_label = Text("probe face", font_size=18, color=BLACK).next_to(probe_face, DOWN, buff=0.1)
         self.play(FadeIn(claimed_block), FadeIn(probe_face), Write(probe_label))
         self.wait(5)

@@ -1,0 +1,67 @@
+{
+  "act": "01_math_crypto",
+  "language": "en-US",
+  "suggested_voice": "en-US-AvaMultilingualNeural",
+  "delivery": "calm technical lecture, deliberate pacing, pronounce CKKS as C-K-K-S",
+  "scope_note": "Narration is expanded from the scene content beats and generated into assets/audio/01_math_crypto.",
+  "scenes": [
+    {
+      "id": "scene_01_he_foundations",
+      "title": "Why Homomorphic Encryption?",
+      "source": "scenes/01_math_crypto/scene_01_he_foundations.py",
+      "beat_methods": ["privacy_beats", "homomorphism_beats", "ring_beats"],
+      "storyboard": "scripts/storyboards/01_math_crypto/scene_01_he_foundations.md",
+      "output": "assets/audio/01_math_crypto/scene_01_he_foundations.mp3",
+      "target_seconds": 900,
+      "sections": [
+        "Privacy boundary and the data-in-use problem",
+        "Homomorphic correctness and arithmetic circuits",
+        "Polynomial rings, RLWE noise, and the bridge to CKKS"
+      ]
+    },
+    {
+      "id": "scene_02_ckks_encoding",
+      "title": "CKKS Encoding and Parameters",
+      "source": "scenes/01_math_crypto/scene_02_ckks_encoding.py",
+      "beat_methods": ["approximation_beats", "packing_beats", "parameter_beats"],
+      "storyboard": "scripts/storyboards/01_math_crypto/scene_02_ckks_encoding.md",
+      "output": "assets/audio/01_math_crypto/scene_02_ckks_encoding.mp3",
+      "target_seconds": 900,
+      "target_wpm": 130,
+      "target_wpm_tolerance": 0.025,
+      "sections": [
+        "Approximate real and complex arithmetic",
+        "SIMD vector slots and rotations",
+        "Scale, coefficient modulus, rescaling, and depth"
+      ]
+    },
+    {
+      "id": "scene_03_ciphertext_operations",
+      "title": "Ciphertext Arithmetic",
+      "source": "scenes/01_math_crypto/scene_03_ciphertext_operations.py",
+      "beat_methods": ["anatomy_beats", "arithmetic_beats", "advanced_beats"],
+      "storyboard": "scripts/storyboards/01_math_crypto/scene_03_ciphertext_operations.md",
+      "output": "assets/audio/01_math_crypto/scene_03_ciphertext_operations.mp3",
+      "target_seconds": 900,
+      "sections": [
+        "Ciphertext components and metadata",
+        "Addition, multiplication, and relinearization",
+        "Levels, rescaling, rotations, and packed reductions"
+      ]
+    },
+    {
+      "id": "scene_04_keys_and_seal_pipeline",
+      "title": "Keys and the SEAL Workflow",
+      "source": "scenes/01_math_crypto/scene_04_keys_and_seal_pipeline.py",
+      "beat_methods": ["key_beats", "object_beats", "lifecycle_beats"],
+      "storyboard": "scripts/storyboards/01_math_crypto/scene_04_keys_and_seal_pipeline.md",
+      "output": "assets/audio/01_math_crypto/scene_04_keys_and_seal_pipeline.mp3",
+      "target_seconds": 900,
+      "sections": [
+        "Secret, public, relinearization, and Galois keys",
+        "Core Microsoft SEAL objects",
+        "End-to-end client and server lifecycle"
+      ]
+    }
+  ]
+}

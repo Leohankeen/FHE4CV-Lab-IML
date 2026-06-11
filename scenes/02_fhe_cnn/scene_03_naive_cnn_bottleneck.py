@@ -1,7 +1,4 @@
 import sys
-
-sys.path.append(".")
-
 from manim import *
 
 from scenes.library.constants import *
