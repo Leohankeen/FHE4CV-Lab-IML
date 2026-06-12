@@ -30,7 +30,7 @@ class CryptoFace(StoryboardScene):
 
     def construct(self):
         # ==================================================
-        # 📍 PHÂN ĐOẠN 1: ĐẶT VẤN ĐỀ & KHÁI NIỆM CỐT LÕI (0:00 - 3:30)
+        # 📍 PHÂN ĐOẠN 1: ĐẶT VẤN ĐỀ & KHÁI NIỆM CỐT LÕI
         # ==================================================
     
         # Tiêu đề Act 3
@@ -78,7 +78,7 @@ class CryptoFace(StoryboardScene):
         self.play(FadeOut(user_node), FadeOut(user_lbl), FadeOut(cloud_node), FadeOut(cloud_lbl), FadeOut(lock_box), FadeOut(fhe_eval_lbl))
 
         # ==================================================
-        # 📍 PHÂN ĐOẠN 2: KIẾN TRÚC CRYPTOFACENET & TỐI ƯU CKKS (3:30 - 7:30)
+        # 📍 PHÂN ĐOẠN 2: KIẾN TRÚC CRYPTOFACENET & TỐI ƯU CKKS
         # ==================================================
         
         depth_title = Text("Challenge: Multiplicative Depth", font_size=24, color=RED).move_to(UP * 3)
@@ -146,7 +146,7 @@ class CryptoFace(StoryboardScene):
         self.play(Write(client_txt), Write(server_txt))
         self.wait(48)
         # ==================================================
-        # 📍 PHÂN ĐOẠN 3: LUỒNG ĐĂNG KÝ - ENROLLMENT (7:30 - 11:30)
+        # 📍 PHÂN ĐOẠN 3: LUỒNG ĐĂNG KÝ - ENROLLMENT
         # ==================================================
         self.add_sound("./assets/audio/03_demos/01_03_1.mp3")
         self.wait(10)
@@ -189,7 +189,7 @@ class CryptoFace(StoryboardScene):
         self.wait(35)
 
         # ==================================================
-        # 📍 PHÂN ĐOẠN 4: LUỒNG XÁC THỰC - VERIFICATION (11:30 - 15:00)
+        # 📍 PHÂN ĐOẠN 4: LUỒNG XÁC THỰC - VERIFICATION
         # ==================================================
         self.add_sound("./assets/audio/03_demos/01_04_1.mp3")
         # 1. Khởi tạo dữ liệu kiểm tra đầu vào tại Client góc dưới
