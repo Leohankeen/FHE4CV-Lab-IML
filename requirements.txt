@@ -6,7 +6,21 @@ scipy
 # Các thư viện hỗ trợ định dạng ảnh và video
 Pillow
 opencv-python
+audioop-lts; python_version >= "3.13"
 
 # Tùy chọn
 jupyterlab
 notebook
+pytest
+
+# Machine learning & utilities
+torch>=2.0.0
+torchvision>=0.15.0
+scikit-image
+scikit-learn
+pandas
+matplotlib
+tqdm
+
+# Homomorphic encryption (TenSEAL - CKKS)
+tenseal

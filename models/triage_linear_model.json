@@ -1,0 +1,30 @@
+{
+  "name": "demo_xray_linear_triage",
+  "feature_names": [
+    "mean_intensity",
+    "std_intensity",
+    "upper_left_mean",
+    "upper_right_mean",
+    "lower_left_mean",
+    "lower_right_mean",
+    "center_mean",
+    "edge_energy",
+    "bright_ratio",
+    "dark_ratio"
+  ],
+  "weights": [
+    -1.15,
+    1.25,
+    -0.35,
+    -0.35,
+    0.25,
+    0.25,
+    -0.55,
+    3.2,
+    0.6,
+    0.9
+  ],
+  "bias": 0.1,
+  "threshold": 0.5,
+  "description": "Fixed educational weights for privacy-preserving X-ray triage scoring. Not trained for clinical diagnosis."
+}
