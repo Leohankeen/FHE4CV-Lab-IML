@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "act": "03_demos",
+  "target_seconds": 3600,
+  "language": "en-US",
+  "suggested_voice": "en-US-AvaMultilingualNeural",
+  "default_rate": "-15%",
+  "target_wpm": 130,
+  "scope_note": "Each storyboard voiceover block is split across the existing clip slots used by the Act 3 demo scenes.",
+  "scenes": [
+    {
+      "id": "scene_01_cryptoface_scene",
+      "title": "CryptoFace - End-to-End Encrypted Face Recognition",
+      "source": "scenes/03_demos/scene_01_cryptoface_scene.py",
+      "storyboard": "scripts/storyboards/03_demos/scene_01_cryptoface_scene.md",
+      "target_seconds": 900,
+      "transcript": "assets/audio/03_demos/scene_01_cryptoface_scene.txt",
+      "audio_sections": [
+        [
+          {"path": "assets/audio/03_demos/01_01_1_1.mp3", "target_seconds": 22.224},
+          {"path": "assets/audio/03_demos/01_01_1_2.mp3", "target_seconds": 47.496},
+          {"path": "assets/audio/03_demos/01_01_2_1.mp3", "target_seconds": 51.864},
+          {"path": "assets/audio/03_demos/01_01_2_2.mp3", "target_seconds": 49.584},
+          {"path": "assets/audio/03_demos/01_01_3_1.mp3", "target_seconds": 32.832},
+          {"path": "assets/audio/03_demos/01_01_3_2.mp3", "target_seconds": 48.912}
+        ],
+        [
+          {"path": "assets/audio/03_demos/01_02_1_1.mp3", "target_seconds": 54.336},
+          {"path": "assets/audio/03_demos/01_02_1_2.mp3", "target_seconds": 44.496},
+          {"path": "assets/audio/03_demos/01_02_2.mp3", "target_seconds": 57.000},
+          {"path": "assets/audio/03_demos/01_02_3.mp3", "target_seconds": 60.504},
+          {"path": "assets/audio/03_demos/01_02_4.mp3", "target_seconds": 48.192}
+        ],
+        [
+          {"path": "assets/audio/03_demos/01_03_1.mp3", "target_seconds": 56.232},
+          {"path": "assets/audio/03_demos/01_03_2.mp3", "target_seconds": 60.600},
+          {"path": "assets/audio/03_demos/01_03_3.mp3", "target_seconds": 57.480},
+          {"path": "assets/audio/03_demos/01_03_4.mp3", "target_seconds": 48.720}
+        ],
+        [
+          {"path": "assets/audio/03_demos/01_04_1.mp3", "target_seconds": 61.392},
+          {"path": "assets/audio/03_demos/01_04_2.mp3", "target_seconds": 55.368},
+          {"path": "assets/audio/03_demos/01_04_3.mp3", "target_seconds": 60.720},
+          {"path": "assets/audio/03_demos/01_04_4.mp3", "target_seconds": 59.928}
+        ]
+      ]
+    },
+    {
+      "id": "scene_02_hers",
+      "title": "HERS - Privacy-Preserving Health Record System",
+      "source": "scenes/03_demos/scene_02_hers.py",
+      "storyboard": "scripts/storyboards/03_demos/scene_02_hers.md",
+      "target_seconds": 900,
+      "transcript": "assets/audio/03_demos/scene_02_hers.txt",
+      "audio_sections": [
+        [
+          {"path": "assets/audio/03_demos/02_01_1.mp3", "target_seconds": 13.248},
+          {"path": "assets/audio/03_demos/02_01_2.mp3", "target_seconds": 31.920},
+          {"path": "assets/audio/03_demos/02_01_3.mp3", "target_seconds": 31.056},
+          {"path": "assets/audio/03_demos/02_01_4.mp3", "target_seconds": 28.104},
+          {"path": "assets/audio/03_demos/02_01_5.mp3", "target_seconds": 16.080},
+          {"path": "assets/audio/03_demos/02_01_6.mp3", "target_seconds": 29.064}
+        ],
+        [
+          {"path": "assets/audio/03_demos/02_02_1.mp3", "target_seconds": 33.168},
+          {"path": "assets/audio/03_demos/02_02_2.mp3", "target_seconds": 38.808},
+          {"path": "assets/audio/03_demos/02_02_3.mp3", "target_seconds": 12.384},
+          {"path": "assets/audio/03_demos/02_02_4.mp3", "target_seconds": 26.160}
+        ],
+        [
+          {"path": "assets/audio/03_demos/02_03_1.mp3", "target_seconds": 39.600},
+          {"path": "assets/audio/03_demos/02_03_2.mp3", "target_seconds": 42.336},
+          {"path": "assets/audio/03_demos/02_03_3.mp3", "target_seconds": 31.176},
+          {"path": "assets/audio/03_demos/02_03_4.mp3", "target_seconds": 36.120}
+        ],
+        [
+          {"path": "assets/audio/03_demos/02_04_1.mp3", "target_seconds": 45.984},
+          {"path": "assets/audio/03_demos/02_04_2.mp3", "target_seconds": 45.720},
+          {"path": "assets/audio/03_demos/02_04_3.mp3", "target_seconds": 36.984}
+        ],
+        [
+          {"path": "assets/audio/03_demos/02_05_1.mp3", "target_seconds": 41.688},
+          {"path": "assets/audio/03_demos/02_05_2.mp3", "target_seconds": 53.112},
+          {"path": "assets/audio/03_demos/02_05_3.mp3", "target_seconds": 43.200}
+        ],
+        [
+          {"path": "assets/audio/03_demos/02_06_1.mp3", "target_seconds": 45.600},
+          {"path": "assets/audio/03_demos/02_06_2.mp3", "target_seconds": 54.816},
+          {"path": "assets/audio/03_demos/02_06_3.mp3", "target_seconds": 38.616},
+          {"path": "assets/audio/03_demos/02_06_4.mp3", "target_seconds": 52.224}
+        ]
+      ]
+    },
+    {
+      "id": "scene_03_pim",
+      "title": "Private Image Matching - Secure Database Retrieval",
+      "source": "scenes/03_demos/scene_03_PIM.py",
+      "storyboard": "scripts/storyboards/03_demos/scene_03_PIM.md",
+      "target_seconds": 900,
+      "transcript": "assets/audio/03_demos/scene_03_PIM.txt",
+      "audio_sections": [
+        [
+          {"path": "assets/audio/03_demos/03_01_1.mp3", "target_seconds": 22.656},
+          {"path": "assets/audio/03_demos/03_01_2.mp3", "target_seconds": 34.344},
+          {"path": "assets/audio/03_demos/03_01_3.mp3", "target_seconds": 52.248},
+          {"path": "assets/audio/03_demos/03_01_4.mp3", "target_seconds": 40.968}
+        ],
+        [
+          {"path": "assets/audio/03_demos/03_02_1.mp3", "target_seconds": 53.304},
+          {"path": "assets/audio/03_demos/03_02_2.mp3", "target_seconds": 46.152},
+          {"path": "assets/audio/03_demos/03_02_3.mp3", "target_seconds": 62.160},
+          {"path": "assets/audio/03_demos/03_02_4.mp3", "target_seconds": 50.208}
+        ],
+        [
+          {"path": "assets/audio/03_demos/03_03_1.mp3", "target_seconds": 66.624},
+          {"path": "assets/audio/03_demos/03_03_2.mp3", "target_seconds": 59.280},
+          {"path": "assets/audio/03_demos/03_03_3.mp3", "target_seconds": 63.048},
+          {"path": "assets/audio/03_demos/03_03_4.mp3", "target_seconds": 54.144}
+        ],
+        [
+          {"path": "assets/audio/03_demos/03_04_1.mp3", "target_seconds": 60.144},
+          {"path": "assets/audio/03_demos/03_04_2.mp3", "target_seconds": 52.032},
+          {"path": "assets/audio/03_demos/03_04_3.mp3", "target_seconds": 51.000},
+          {"path": "assets/audio/03_demos/03_04_4.mp3", "target_seconds": 62.256}
+        ]
+      ]
+    },
+    {
+      "id": "scene_04_xray",
+      "title": "Medical X-Ray FHE Demo - TenSEAL Linear Triage",
+      "source": "scenes/03_demos/scene_04_Xray.py",
+      "storyboard": "scripts/storyboards/03_demos/scene_04_Xray.md",
+      "target_seconds": 900,
+      "transcript": "assets/audio/03_demos/scene_04_Xray.txt",
+      "audio_sections": [
+        [
+          {"path": "assets/audio/03_demos/04_01_1.mp3", "target_seconds": 51.456},
+          {"path": "assets/audio/03_demos/04_01_2.mp3", "target_seconds": 39.240},
+          {"path": "assets/audio/03_demos/04_01_3.mp3", "target_seconds": 42.120}
+        ],
+        [
+          {"path": "assets/audio/03_demos/04_02_1.mp3", "target_seconds": 53.592},
+          {"path": "assets/audio/03_demos/04_02_2.mp3", "target_seconds": 57.312},
+          {"path": "assets/audio/03_demos/04_02_3.mp3", "target_seconds": 35.640}
+        ],
+        [
+          {"path": "assets/audio/03_demos/04_03_1.mp3", "target_seconds": 39.528},
+          {"path": "assets/audio/03_demos/04_03_2.mp3", "target_seconds": 59.280}
+        ],
+        [
+          {"path": "assets/audio/03_demos/04_04_1.mp3", "target_seconds": 43.968},
+          {"path": "assets/audio/03_demos/04_04_2.mp3", "target_seconds": 41.952},
+          {"path": "assets/audio/03_demos/04_04_3.mp3", "target_seconds": 27.072},
+          {"path": "assets/audio/03_demos/04_04_4.mp3", "target_seconds": 40.824}
+        ]
+      ]
+    }
+  ]
+}
