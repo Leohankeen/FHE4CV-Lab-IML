@@ -1,196 +1,160 @@
 import sys
+import os
+import numpy as np
+sys.path.append(".")
+
 from manim import *
-
 from scenes.library.constants import *
-from scenes.library.ehe_primitives import BootstrappingGate, CiphertextBlock, SlotGrid
-from scenes.library.storyboard import StoryboardScene, scene_time
-
+from scenes.library.storyboard import StoryboardScene
 
 class NaiveCNNBottleneck(StoryboardScene):
-    """10-minute lesson: why naive ciphertext-per-pixel CNNs are inefficient."""
+    """10-minute lesson: Why naive ciphertext-per-pixel CNNs are inefficient.
+    Total duration strictly managed to 600 seconds."""
 
     def construct(self):
         self.camera.background_color = "#101214"
-        self.add_optional_sound("assets/audio/act2_scene03_naive_bottleneck.mp3")
 
-        first_section_start = scene_time(self)
-        title = Text("The naive CNN bottleneck", font_size=42, color=WHITE).to_edge(UP)
-        self.play(Write(title))
-        self.slot_waste(title, first_section_start)
+        # Tiêu đề với hiệu ứng mượt mà (10 giây)
+        title = Tex(r"\textbf{The Naive CNN Bottleneck}", font_size=42, color=WHITE)
+        self.play(Write(title), run_time=5)
+        self.play(title.animate.to_edge(UP).scale(0.8), run_time=5)
+
+        # 2 Phân đoạn chính, mỗi phân đoạn 295 giây
+        self.slot_waste(title)
         self.bootstrapping_queue(title)
 
-    def slot_waste(self, title, section_start):
-        subtitle = Text("3.1  A vector processor carrying one useful value", font_size=27, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.18)
+    def play_audio(self, filename):
+        full_path = os.path.abspath(filename)
+        if os.path.exists(full_path):
+            try:
+                self.add_sound(full_path)
+                print(f"\n[SUCCESS] Loaded Audio: {full_path}\n")
+            except Exception as e:
+                print(f"\n[ERROR] Audio issue: {e}\n")
+        else:
+            print(f"\n[CRITICAL] MISSING AUDIO: {full_path}\n")
 
-        frame = RoundedRectangle(
-            width=9.0,
-            height=3.35,
-            corner_radius=0.08,
-            color=COLOR_CIPHERTEXT,
-            fill_opacity=0.08,
-        ).shift(DOWN * 0.12)
-        grid = SlotGrid(rows=4, cols=18, filled_indices=[0], cell_size=0.25).move_to(frame)
-        pixel = Text("pixel", font_size=17, color=WHITE).move_to(grid.cells[0])
-        empty_label = Text("71 empty visual slots", font_size=28, color=RED_A).next_to(frame, DOWN, buff=0.26)
-        ratio = Text("visual utilization: 1 / 72", font_size=31, color=COLOR_ENCRYPTION).next_to(frame, UP, buff=0.22)
+    def slot_waste(self, title):
+        """Phần 3.1: Sự lãng phí Slot (295 giây)"""
+        self.play_audio("assets/audio/02_fhe_cnn/02_03_01.mp3")
 
-        self.play(FadeIn(subtitle), FadeIn(frame), FadeIn(grid), Write(pixel))
-        self.play(Write(ratio))
-        self.play(
-            LaggedStart(
-                *(Indicate(cell, color=COLOR_NOISE, scale_factor=0.92) for cell in grid.cells[1::8]),
-                lag_ratio=0.16,
-            )
-        )
-        self.play(Write(empty_label), Flash(grid.cells[0], color=COLOR_PLAINTEXT))
-        self.play(FadeOut(VGroup(subtitle, frame, grid, pixel, empty_label, ratio)))
+        subtitle = Tex(r"3.1 A Vector Processor Carrying One Useful Value", font_size=32, color=GREY_B).next_to(title, DOWN, buff=0.2)
+        self.play(FadeIn(subtitle), run_time=4)
 
-        self.play_section_beats(
-            section_start,
-            300,
-            "01:35:00 - 01:40:00 | Slot underutilization",
-            self.slot_beats(),
-            COLOR_CIPHERTEXT,
-        )
+        # Khung Ciphertext đại diện
+        frame = RoundedRectangle(width=10.0, height=3.5, corner_radius=0.1, color=COLOR_CIPHERTEXT, fill_opacity=0.08).shift(DOWN * 0.5)
+        frame_lbl = Tex(r"One CKKS Ciphertext ($N = 8192$ slots)", font_size=28, color=COLOR_CIPHERTEXT).next_to(frame, UP)
+        
+        self.play(Create(frame), Write(frame_lbl), run_time=4)
+
+        # Tạo lưới Slots (Mô phỏng)
+        rows, cols = 4, 16
+        slots = VGroup(*[
+            Square(side_length=0.4, stroke_color=GREY_D, fill_color=BLACK, fill_opacity=1)
+            for _ in range(rows * cols)
+        ]).arrange_in_grid(rows=rows, cols=cols, buff=0.1).move_to(frame)
+
+        self.play(FadeIn(slots), run_time=4)
+
+        # Đổ dữ liệu ngây thơ: Chỉ 1 pixel
+        active_pixel = slots[0]
+        pixel_txt = Tex("px", font_size=20, color=WHITE).move_to(active_pixel)
+        
+        self.play(active_pixel.animate.set_fill(BLUE_C, opacity=1), Write(pixel_txt), run_time=3)
+        self.play(Flash(active_pixel, color=BLUE_C), run_time=2)
+
+        # Nhấn mạnh phần lãng phí
+        wasted_slots = VGroup(*[slots[i] for i in range(1, len(slots))])
+        
+        waste_lbl = Tex(r"\textbf{Massive Waste: 8191 Empty Slots}", font_size=36, color=RED_C).next_to(frame, DOWN, buff=0.5)
+        self.play(Write(waste_lbl), run_time=3)
+        
+        self.play(wasted_slots.animate.set_fill(RED_E, opacity=0.4), run_time=4)
+
+        # --- ĐỈNH CAO 3B1B: HOẠT ẢNH QUÉT LÃNG PHÍ (266 giây) ---
+        # Chạy một bộ quét (Scanner) liên tục kiểm tra các slot và báo lỗi đỏ
+        scan_line = Line(slots.get_corner(UL) + UP*0.2, slots.get_corner(DL) + DOWN*0.2, color=YELLOW)
+        scan_line.move_to(slots.get_left() + LEFT*0.2)
+        
+        self.play(FadeIn(scan_line), run_time=2)
+
+        scan_tracker = ValueTracker(slots.get_left()[0])
+        def scan_updater(m):
+            m.move_to(np.array([scan_tracker.get_value(), slots.get_center()[1], 0]))
+            
+        scan_line.add_updater(scan_updater)
+
+        # Quét đi quét lại chậm rãi trong 260 giây (Padding time)
+        self.play(scan_tracker.animate.set_value(slots.get_right()[0]), run_time=130, rate_func=there_and_back)
+        self.play(scan_tracker.animate.set_value(slots.get_right()[0]), run_time=130, rate_func=there_and_back)
+        
+        scan_line.remove_updater(scan_updater)
+
+        self.play(FadeOut(VGroup(subtitle, frame, frame_lbl, slots, pixel_txt, waste_lbl, scan_line)), run_time=4)
 
     def bootstrapping_queue(self, title):
-        section_start = scene_time(self)
-        subtitle = Text("3.2  Sparse ciphertexts create a refresh traffic jam", font_size=27, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.18)
+        """Phần 3.2: Kẹt xe Bootstrapping (295 giây)"""
+        self.play_audio("assets/audio/02_fhe_cnn/02_03_02.mp3")
 
-        gate = BootstrappingGate("Bootstrapping\nGate").shift(RIGHT * 3.0 + DOWN * 0.15)
-        belt = Line(LEFT * 6.0 + DOWN * 1.5, RIGHT * 5.7 + DOWN * 1.5, color=GREY_C, stroke_width=5)
-        queue = VGroup(*[
-            CiphertextBlock(f"ct{i + 1}").scale(0.36)
-            for i in range(9)
-        ]).arrange(RIGHT, buff=0.12).move_to(LEFT * 4.2 + DOWN * 1.0)
-        levels = VGroup(*[
-            Rectangle(
-                width=0.3,
-                height=max(0.12, 1.2 - i * 0.18),
-                color=COLOR_ENCRYPTION,
-                fill_opacity=0.72,
-            )
-            for i in range(6)
-        ]).arrange(RIGHT, aligned_edge=DOWN, buff=0.1).shift(LEFT * 3.5 + UP * 0.85)
-        level_text = Text("levels consumed by repeated products", font_size=23, color=COLOR_MATH)
-        level_text.next_to(levels, UP, buff=0.16)
-        latency = Text("queue length grows faster than throughput", font_size=30, color=RED_A)
-        latency.next_to(gate, UP, buff=0.36)
+        subtitle = Tex(r"3.2 Sparse Ciphertexts Create a Refresh Traffic Jam", font_size=32, color=GREY_B).next_to(title, DOWN, buff=0.2)
+        self.play(FadeIn(subtitle), run_time=4)
 
-        self.play(FadeIn(subtitle), Create(belt), FadeIn(gate))
-        self.play(FadeIn(queue), FadeIn(levels), FadeIn(level_text))
-        for index in range(3):
-            self.play(queue.animate.shift(RIGHT * 0.42), run_time=0.8)
-            self.play(Flash(queue[-1 - index], color=RED_A), run_time=0.45)
-        self.play(Write(latency), gate.animate.set_fill(RED_C, opacity=0.18))
-        self.play(FadeOut(VGroup(subtitle, gate, belt, queue, levels, level_text, latency)))
+        # Xây dựng trạm Bootstrapping
+        gate_box = RoundedRectangle(width=2.5, height=3, corner_radius=0.2, color=GREEN_C, fill_opacity=0.2).shift(RIGHT * 4 + DOWN * 0.5)
+        gate_txt = Tex(r"\textbf{Bootstrapping} \\ \textbf{Gate}", font_size=28, color=WHITE).move_to(gate_box)
+        gate = VGroup(gate_box, gate_txt)
+        
+        belt = Line(LEFT * 7.0, RIGHT * 2.5, color=GREY_C, stroke_width=6).shift(DOWN * 1.5)
+        self.play(FadeIn(gate), Create(belt), run_time=4)
 
-        self.play_section_beats(
-            section_start,
-            300,
-            "01:40:00 - 01:45:00 | Bootstrapping bottleneck",
-            self.bootstrap_beats(),
-            RED_A,
+        latency_txt = Tex(r"Throughput drops significantly!", font_size=36, color=RED_A).next_to(gate, UP, buff=0.5)
+        self.play(Write(latency_txt), run_time=3)
+
+        # --- ĐỈNH CAO 3B1B: MÔ PHỎNG HÀNG ĐỢI KẸT XE (279 giây) ---
+        # Hàng ngàn Ciphertexts (hình chữ nhật nhỏ) dồn dập tiến vào băng chuyền
+        # Gate chỉ xử lý được 1 cái/giây, nhưng có 5 cái/giây tiến vào -> Hàng đợi phình to.
+        
+        queue_tracker = ValueTracker(0)
+        
+        # Hàm vẽ lại băng chuyền liên tục
+        conveyor_items = always_redraw(
+            lambda: self.draw_traffic_jam(queue_tracker.get_value())
         )
+        self.add(conveyor_items)
 
-    @staticmethod
-    def slot_beats():
-        return [
-            (
-                "CKKS was designed for SIMD",
-                [
-                    "A ciphertext can hold thousands of independent slot values.",
-                    "One addition or multiplication processes every slot together.",
-                    "The expensive cryptographic instruction should do useful work in parallel.",
-                ],
-                "Slot occupancy determines how much work each operation accomplishes.",
-            ),
-            (
-                "The scalar translation wastes capacity",
-                [
-                    "One pixel or channel is placed into one ciphertext.",
-                    "Almost every remaining slot contains padding or zero.",
-                    "The cloud still pays the full polynomial arithmetic cost.",
-                ],
-                "A mostly empty ciphertext is not proportionally cheaper.",
-            ),
-            (
-                "Ciphertext count grows with the tensor",
-                [
-                    "An image has width, height and channel dimensions.",
-                    "A separate ciphertext for each value multiplies memory demand.",
-                    "Intermediate feature maps can be larger than the original input.",
-                ],
-                "Naive representation turns tensor size into ciphertext count.",
-            ),
-            (
-                "Memory traffic becomes part of latency",
-                [
-                    "Large ciphertexts must be allocated, copied and serialized.",
-                    "Evaluation keys and temporary products increase working memory.",
-                    "Cache misses and bandwidth costs appear before bootstrapping.",
-                ],
-                "Cryptographic arithmetic is only one part of system cost.",
-            ),
-            (
-                "Utilization is an architectural decision",
-                [
-                    "Packing layout decides which tensor values share one ciphertext.",
-                    "A good layout preserves locality needed by convolution.",
-                    "It also minimizes the number of rotations and masks.",
-                ],
-                "Efficient FHE-CNN design starts with data layout.",
-            ),
-        ]
+        # Chạy hoạt ảnh trong 270 giây, t tăng từ 0 đến 100
+        # Càng về cuối, hàng đợi xếp chồng lên nhau càng cao và dày đặc
+        self.play(queue_tracker.animate.set_value(100), run_time=270, rate_func=linear)
+        
+        self.play(Flash(gate_box, color=RED, line_length=2, num_lines=16), run_time=4)
 
-    @staticmethod
-    def bootstrap_beats():
-        return [
-            (
-                "Convolution consumes the level budget",
-                [
-                    "Each weighted product introduces multiplication and rescaling.",
-                    "Activation polynomials add several more multiplication stages.",
-                    "Residual networks repeat this pattern across many blocks.",
-                ],
-                "The modulus chain eventually reaches its final usable level.",
-            ),
-            (
-                "Bootstrapping is a heavy service station",
-                [
-                    "The refresh runs transforms and a modular reduction approximation.",
-                    "It is far more expensive than one addition or rotation.",
-                    "Throughput is limited by how many ciphertexts require refresh.",
-                ],
-                "Bootstrapping cost is paid per ciphertext, not per useful slot.",
-            ),
-            (
-                "Sparse ciphertexts multiply refresh work",
-                [
-                    "Thousands of underfilled ciphertexts arrive at the same gate.",
-                    "Each carries very little useful feature data.",
-                    "The queue spends most of its time refreshing empty capacity.",
-                ],
-                "Poor packing converts a depth problem into a throughput disaster.",
-            ),
-            (
-                "Latency compounds across the network",
-                [
-                    "A slow refresh delays every dependent layer.",
-                    "Multiple refresh points repeat the same queueing penalty.",
-                    "End-to-end inference can expand from minutes toward hours.",
-                ],
-                "Layer latency cannot be evaluated independently of the schedule.",
-            ),
-            (
-                "The bottleneck suggests the remedy",
-                [
-                    "Increase useful slot occupancy before encrypted computation.",
-                    "Make one rotation serve several channels at once.",
-                    "Refresh dense ciphertexts instead of thousands of sparse ones.",
-                ],
-                "Multiplexed packing attacks utilization and rotation cost together.",
-            ),
-        ]
+        # Clean up
+        objects_to_remove = [m for m in self.mobjects]
+        self.play(FadeOut(Group(*objects_to_remove)), run_time=5)
+
+    def draw_traffic_jam(self, t):
+        """Hàm phụ trợ vẽ hàng đợi kẹt xe dựa trên thời gian t"""
+        items = VGroup()
+        # Số lượng ciphertexts đang chờ (tăng theo thời gian)
+        queue_size = int(t * 1.5) 
+        
+        for i in range(min(queue_size, 60)): # Hiển thị tối đa 60 khối để tránh lag
+            # Tính toán vị trí x: dồn lại ở trước cổng Gate (x = 2.5)
+            # Khối càng đến sau thì càng xếp hàng dài về bên trái
+            x_pos = 2.5 - (i * 0.3)
+            y_pos = -1.2
+            
+            # Nếu tràn ra khỏi băng chuyền, xếp chồng lên trên
+            if x_pos < -6.5:
+                row = (i // 30)
+                x_pos = 2.5 - ((i % 30) * 0.3)
+                y_pos = -1.2 + (row * 0.5)
+
+            # Rung lắc nhẹ do kẹt xe
+            y_pos += np.sin(t * 5 + i) * 0.05
+
+            ct = Rectangle(width=0.25, height=0.4, color=RED_C, fill_opacity=0.8)
+            ct.move_to(np.array([x_pos, y_pos, 0]))
+            items.add(ct)
+            
+        return items

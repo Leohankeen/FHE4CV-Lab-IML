@@ -36,7 +36,6 @@
 ## III. QUẢN LÝ TÀI NGUYÊN BỔ TRỢ (ASSETS MAPPING)
 - Audio gốc: `assets/audio/act2_scene02_poly_approx.mp3`
 - Tài liệu tham khảo lý thuyết: Bài báo "AutoFHE" (Mục tối ưu hóa hàm kích hoạt) và bài báo của Eunsang Lee (ICML 2022 - Thuật toán Imaginary-Removing).
-- Tài liệu tham khảo lý thuyết: Bài báo "AutoFHE" (Mục tối ưu hóa hàm kích hoạt) và bài báo của Eunsang Lee (ICML 2022 - Thuật toán Imaginary-Removing).
 
 ## IV. EXPANDED CONTENT BEATS CHO BẢN 20 PHÚT
 - Phân đoạn 2.1: miền xấp xỉ, ý nghĩa hệ số, thứ tự đánh giá Horner/cây cân bằng, sai số tích lũy và fine-tuning nhận biết đa thức.

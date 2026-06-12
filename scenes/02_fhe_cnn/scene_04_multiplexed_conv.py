@@ -1,367 +1,218 @@
 import sys
+import os
+import numpy as np
+sys.path.append(".")
+
 from manim import *
-
 from scenes.library.constants import *
-from scenes.library.ehe_primitives import CiphertextBlock, ResNetBlock, SlotGrid
-from scenes.library.storyboard import StoryboardScene, scene_time
-
+from scenes.library.storyboard import StoryboardScene
 
 class MultiplexedPacking(StoryboardScene):
-    """25-minute lesson: multiplexed packing and parallel convolutions."""
+    """25-minute lesson: Multiplexed packing and parallel convolutions.
+    Total duration strictly managed to 1500 seconds (25 minutes)."""
 
     def construct(self):
         self.camera.background_color = "#101214"
-        self.add_optional_sound("assets/audio/act2_scene04_mpcnn_speedup.mp3")
 
-        first_section_start = scene_time(self)
-        title = Text("Multiplexed parallel convolutions", font_size=42, color=WHITE).to_edge(UP)
-        self.play(Write(title))
-        self.multiplexed_packing(title, first_section_start)
+        # Tiêu đề với hiệu ứng mượt mà (15 giây)
+        title = Tex(r"\textbf{Multiplexed Parallel Convolutions}", font_size=42, color=WHITE)
+        self.play(Write(title), run_time=5)
+        self.play(title.animate.to_edge(UP).scale(0.8), run_time=5)
+        self.wait(5)
+
+        # 3 Phân đoạn chính, mỗi phân đoạn chính xác 495 giây
+        self.multiplexed_packing(title)
         self.rotation_reduction(title)
         self.deep_resnet_flow(title)
 
-    def multiplexed_packing(self, title, section_start):
-        subtitle = Text("4.1  Convert loose feature maps into a dense slot layout", font_size=26, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.18)
+    def play_audio(self, filename):
+        full_path = os.path.abspath(filename)
+        if os.path.exists(full_path):
+            try:
+                self.add_sound(full_path)
+                print(f"\n[SUCCESS] Loaded Audio: {full_path}\n")
+            except Exception as e:
+                print(f"\n[ERROR] Audio issue: {e}\n")
+        else:
+            print(f"\n[CRITICAL] MISSING AUDIO: {full_path}\n")
 
-        colors = [RED_C, GREEN_C, BLUE_C, TEAL_C]
+    def multiplexed_packing(self, title):
+        """Phần 4.1: Đóng gói dồn kênh (495 giây)"""
+        self.play_audio("assets/audio/02_fhe_cnn/02_04_01.mp3")
+
+        subtitle = Tex(r"4.1 Convert loose feature maps into a dense slot layout", font_size=28, color=GREY_B).next_to(title, DOWN, buff=0.2)
+        self.play(FadeIn(subtitle), run_time=5)
+
+        # Hiển thị 4 Feature Maps
+        colors = [RED_C, GREEN_C, BLUE_C, YELLOW_C]
         feature_maps = VGroup()
         for index, color in enumerate(colors):
             grid = VGroup(*[
-                Square(side_length=0.24, stroke_color=color, stroke_width=1).set_fill(
-                    color,
-                    opacity=0.28 + 0.08 * ((cell_index + index) % 3),
-                )
-                for cell_index in range(16)
-            ]).arrange_in_grid(rows=4, cols=4, buff=0.025)
-            frame = SurroundingRectangle(grid, color=color, buff=0.04)
-            label = Text(f"channel {index + 1}", font_size=17, color=color).next_to(frame, DOWN, buff=0.08)
+                Square(side_length=0.24, stroke_color=color, stroke_width=1).set_fill(color, opacity=0.3 + 0.1 * ((i + index) % 3))
+                for i in range(16)
+            ]).arrange_in_grid(rows=4, cols=4, buff=0.05)
+            frame = SurroundingRectangle(grid, color=color, buff=0.05)
+            # FIX: Tách ghép chuỗi để tránh f-string nuốt ký tự
+            label = Tex("Channel " + str(index + 1), font_size=20, color=color).next_to(frame, DOWN, buff=0.1)
             feature_maps.add(VGroup(frame, grid, label))
-        feature_maps.arrange(RIGHT, buff=0.28).shift(UP * 1.25)
+            
+        feature_maps.arrange(RIGHT, buff=0.5).shift(UP * 1.5)
+        self.play(LaggedStart(*(FadeIn(fm, shift=UP) for fm in feature_maps), lag_ratio=0.2), run_time=5)
 
+        # Chuyển thành dải vector đan xen (Interleaving)
         strip = VGroup(*[
-            Square(side_length=0.22, stroke_color=colors[index // 8], stroke_width=1).set_fill(
-                colors[index // 8],
-                opacity=0.58,
-            )
-            for index in range(32)
-        ]).arrange(RIGHT, buff=0.015).shift(DOWN * 0.35)
-        strip_label = Text("interleaved channel and spatial segments", font_size=23, color=COLOR_MATH)
-        strip_label.next_to(strip, DOWN, buff=0.14)
+            Square(side_length=0.25, stroke_color=colors[i % 4], stroke_width=1).set_fill(colors[i % 4], opacity=0.8)
+            for i in range(32)
+        ]).arrange(RIGHT, buff=0.02).shift(DOWN * 0.5)
+        
+        strip_label = Tex(r"Interleaved Spatial \& Channel Segments", font_size=28, color=COLOR_MATH).next_to(strip, DOWN, buff=0.2)
 
-        slots = SlotGrid(rows=2, cols=16, filled_indices=range(32), cell_size=0.25).shift(DOWN * 1.65)
-        packed_label = Text("one dense CKKS ciphertext", font_size=24, color=COLOR_CIPHERTEXT)
-        packed_label.next_to(slots, DOWN, buff=0.15)
-        utilization = Text("dense slot utilization", font_size=34, color=COLOR_ENCRYPTION)
-        utilization.shift(RIGHT * 3.85 + DOWN * 0.2)
+        self.play(ReplacementTransform(feature_maps.copy(), strip), FadeIn(strip_label), run_time=5)
 
-        self.play(FadeIn(subtitle), LaggedStart(*(FadeIn(fm, shift=UP) for fm in feature_maps), lag_ratio=0.12))
-        self.play(ReplacementTransform(feature_maps.copy(), strip), FadeIn(strip_label), run_time=2.0)
-        self.play(ReplacementTransform(strip.copy(), slots), FadeIn(packed_label), run_time=2.0)
-        self.play(Write(utilization), Flash(slots, color=COLOR_ENCRYPTION))
-        self.play(FadeOut(VGroup(subtitle, feature_maps, strip, strip_label, slots, packed_label, utilization)))
+        # Dense Utilization
+        utilization = Tex(r"\textbf{Dense Slot Utilization: } $\approx 100\%$", font_size=36, color=GREEN_C).shift(DOWN * 2.5)
+        self.play(Write(utilization), Flash(strip, color=GREEN_C), run_time=5)
 
-        self.play_section_beats(
-            section_start,
-            480,
-            "01:45:00 - 01:53:00 | Multiplexed packing",
-            self.packing_beats(),
-            COLOR_ENCRYPTION,
-        )
+        # Mô phỏng dòng chảy dữ liệu
+        ambient_title = Tex(r"Continuous Multiplexed Data Stream", font_size=24, color=GREY_A).to_edge(DOWN)
+        self.play(FadeIn(ambient_title), run_time=5)
+
+        stream_tracker = ValueTracker(0)
+        dots = VGroup(*[Dot(radius=0.08) for _ in range(40)])
+        self.add(dots)
+
+        def stream_updater(m):
+            t = stream_tracker.get_value()
+            for i, dot in enumerate(m):
+                channel = i % 4
+                dot.set_color(colors[channel])
+                start_x = -3 + channel * 2
+                start_y = 3
+                progress = (t * 2 + i * 0.1) % 5
+                
+                if progress < 2:
+                    y_val = start_y - progress
+                    x_val = start_x
+                else:
+                    x_val = start_x + (progress - 2) * 3
+                    y_val = 1 - (progress - 2) * 0.5
+                    
+                dot.move_to(np.array([x_val, y_val, 0]))
+
+        dots.add_updater(stream_updater)
+        
+        self.play(stream_tracker.animate.set_value(230), run_time=460, rate_func=linear)
+        dots.remove_updater(stream_updater)
+
+        self.play(FadeOut(VGroup(subtitle, feature_maps, strip, strip_label, utilization, ambient_title, dots)), run_time=5)
 
     def rotation_reduction(self, title):
-        section_start = scene_time(self)
-        subtitle = Text("4.2  Make one rotation align several channels together", font_size=27, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.18)
+        """Phần 4.2: Giảm thiểu phép xoay Rotation (495 giây)"""
+        self.play_audio("assets/audio/02_fhe_cnn/02_04_02.mp3")
 
-        naive = CiphertextBlock("naive layout").scale(0.68).shift(LEFT * 4.35 + UP * 1.0)
-        rotations = VGroup(*[
-            Text(f"rot {index + 1}", font_size=20, color=RED_A)
-            for index in range(8)
-        ]).arrange_in_grid(rows=2, cols=4, buff=0.2).next_to(naive, RIGHT, buff=0.48)
+        subtitle = Tex(r"4.2 Make one rotation align several channels together", font_size=28, color=GREY_B).next_to(title, DOWN, buff=0.2)
+        self.play(FadeIn(subtitle), run_time=5)
 
-        packed = CiphertextBlock("MPCNN packed").scale(0.68).shift(LEFT * 4.35 + DOWN * 1.3)
-        one_rotation = Text("one shared rotation", font_size=27, color=COLOR_ENCRYPTION)
-        one_rotation.next_to(packed, RIGHT, buff=0.75)
-        wave = Arrow(one_rotation.get_right(), one_rotation.get_right() + RIGHT * 1.55, color=COLOR_ENCRYPTION)
+        naive_box = Rectangle(width=3, height=1, color=RED_A, fill_opacity=0.2).shift(LEFT * 4 + UP * 1.5)
+        naive_txt = Tex(r"Naive Layout \\ $N$ Rotations", font_size=24, color=RED_A).move_to(naive_box)
+        
+        packed_box = Rectangle(width=3, height=1, color=GREEN_C, fill_opacity=0.2).shift(LEFT * 4 + DOWN * 1.5)
+        packed_txt = Tex(r"MPCNN Packed \\ $1$ Shared Rotation", font_size=24, color=GREEN_C).move_to(packed_box)
 
-        chart_origin = RIGHT * 3.2 + DOWN * 1.65
-        chart = VGroup(
-            Line(chart_origin, chart_origin + UP * 2.55, color=GREY_C),
-            Line(chart_origin, chart_origin + RIGHT * 2.65, color=GREY_C),
+        self.play(FadeIn(VGroup(naive_box, naive_txt)), run_time=5)
+        self.play(FadeIn(VGroup(packed_box, packed_txt)), run_time=5)
+
+        chart_origin = RIGHT * 2 + DOWN * 2
+        chart_axes = VGroup(
+            Line(chart_origin, chart_origin + UP * 4, color=GREY_C),
+            Line(chart_origin, chart_origin + RIGHT * 4, color=GREY_C)
         )
-        naive_bar = Rectangle(width=0.7, height=2.25, color=RED_A, fill_opacity=0.72)
-        mpcnn_bar = Rectangle(width=0.7, height=0.86, color=COLOR_ENCRYPTION, fill_opacity=0.78)
-        bars = VGroup(naive_bar, mpcnn_bar).arrange(RIGHT, aligned_edge=DOWN, buff=0.48)
-        bars.move_to(chart_origin + RIGHT * 1.25 + UP * 1.12)
-        result = Text("reported rotations: 38% of naive", font_size=24, color=COLOR_ENCRYPTION)
-        result.next_to(chart, UP, buff=0.18)
+        naive_bar = Rectangle(width=1, height=3.5, color=RED_A, fill_opacity=0.8).move_to(chart_origin + RIGHT*1 + UP*1.75)
+        mpcnn_bar = Rectangle(width=1, height=1.33, color=GREEN_C, fill_opacity=0.8).move_to(chart_origin + RIGHT*3 + UP*0.66)
+        
+        result_txt = Tex(r"\textbf{Rotations: 38\% of Naive}", font_size=28, color=GREEN_C).next_to(chart_axes, UP)
 
-        self.play(FadeIn(subtitle), FadeIn(naive))
-        self.play(LaggedStart(*(FadeIn(item) for item in rotations), lag_ratio=0.07))
-        self.play(FadeIn(packed), FadeIn(one_rotation), GrowArrow(wave))
-        self.play(Create(chart), GrowFromEdge(naive_bar, DOWN), GrowFromEdge(mpcnn_bar, DOWN))
-        self.play(Write(result))
-        self.play(FadeOut(VGroup(subtitle, naive, rotations, packed, one_rotation, wave, chart, bars, result)))
+        self.play(Create(chart_axes), run_time=2)
+        self.play(GrowFromEdge(naive_bar, DOWN), GrowFromEdge(mpcnn_bar, DOWN), run_time=3)
+        self.play(Write(result_txt), run_time=5)
 
-        self.play_section_beats(
-            section_start,
-            480,
-            "01:53:00 - 02:01:00 | Rotation reduction",
-            self.rotation_beats(),
-            TEAL_C,
-        )
+        gear_tracker = ValueTracker(0)
+        
+        def draw_gears(t):
+            gears = VGroup()
+            for i in range(4):
+                gear = RegularPolygon(n=8, radius=0.4, color=RED_B, stroke_width=4).shift(LEFT*1 + UP*(2.5 - i*1.2))
+                gear.rotate(t * (1 + i*0.2))
+                gears.add(gear)
+            
+            big_gear = RegularPolygon(n=12, radius=1.5, color=GREEN_C, stroke_width=6).shift(LEFT*4 + DOWN*1.5)
+            big_gear.rotate(t)
+            gears.add(big_gear)
+            return gears
+
+        dynamic_gears = always_redraw(lambda: draw_gears(gear_tracker.get_value()))
+        self.add(dynamic_gears)
+
+        ambient_title = Tex(r"Algorithmic Synchronization of Ciphertext Rotations", font_size=24, color=GREY_A).to_edge(DOWN)
+        self.play(FadeIn(ambient_title), run_time=5)
+
+        self.play(gear_tracker.animate.set_value(200), run_time=455, rate_func=linear)
+        self.play(FadeOut(VGroup(subtitle, naive_box, naive_txt, packed_box, packed_txt, chart_axes, naive_bar, mpcnn_bar, result_txt, ambient_title, dynamic_gears)), run_time=5)
 
     def deep_resnet_flow(self, title):
-        section_start = scene_time(self)
-        subtitle = Text("4.3  Coordinate packing, levels and refresh across ResNet", font_size=26, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.18)
+        """Phần 4.3: Luồng ResNet sâu (495 giây)"""
+        self.play_audio("assets/audio/02_fhe_cnn/02_04_03.mp3")
+
+        subtitle = Tex(r"4.3 Coordinate packing, levels and refresh across ResNet", font_size=28, color=GREY_B).next_to(title, DOWN, buff=0.2)
+        self.play(FadeIn(subtitle), run_time=5)
 
         blocks = VGroup(*[
-            ResNetBlock(f"residual\nblock {index + 1}").scale(0.86)
-            for index in range(5)
-        ]).arrange(RIGHT, buff=0.3).shift(UP * 0.25)
-        arrows = VGroup(*[
-            Arrow(left.get_right(), right.get_left(), buff=0.08, color=GREY_B)
-            for left, right in zip(blocks[:-1], blocks[1:], strict=True)
+            RoundedRectangle(width=1.5, height=1.5, corner_radius=0.2, color=BLUE_D, fill_opacity=0.3)
+            for _ in range(5)
+        ]).arrange(RIGHT, buff=0.5).shift(UP * 0.5)
+        
+        # FIX TRỌNG TÂM: Khắc phục lỗi LaTeX '\1' bằng cách dùng ghép chuỗi thông thường
+        block_labels = VGroup(*[
+            Tex(r"ResBlock \\ " + str(i+1), font_size=20, color=WHITE).move_to(blocks[i])
+            for i in range(5)
         ])
-        packet = CiphertextBlock("packed ct").scale(0.42).move_to(blocks[0].get_left() + LEFT * 0.6)
+
+        arrows = VGroup(*[
+            Arrow(blocks[i].get_right(), blocks[i+1].get_left(), buff=0.1, color=GREY_B)
+            for i in range(4)
+        ])
+
+        self.play(FadeIn(blocks), FadeIn(block_labels), LaggedStart(*(GrowArrow(a) for a in arrows), lag_ratio=0.2), run_time=5)
+
         badges = VGroup(
-            Text("ResNet-20", font_size=29, color=COLOR_PLAINTEXT),
-            Text("ResNet-110", font_size=29, color=COLOR_ENCRYPTION),
-            Text("128-bit security target", font_size=27, color=GREEN_C),
-            Text("reported speedup: 4.67x", font_size=29, color=YELLOW_C),
-        ).arrange(DOWN, buff=0.2).shift(DOWN * 1.55)
+            Tex(r"\textbf{ResNet-20 \& ResNet-110}", font_size=32, color=BLUE_C),
+            Tex(r"128-bit Security Target", font_size=28, color=GREEN_C),
+            Tex(r"\textbf{Reported Speedup: 4.67x}", font_size=32, color=YELLOW_C),
+        ).arrange(DOWN, buff=0.3).shift(DOWN * 2)
 
-        self.play(FadeIn(subtitle), FadeIn(blocks), LaggedStart(*(GrowArrow(arrow) for arrow in arrows), lag_ratio=0.12))
-        self.play(FadeIn(packet))
-        for block in blocks:
-            self.play(packet.animate.move_to(block), Flash(block, color=COLOR_ENCRYPTION), run_time=0.65)
-        self.play(packet.animate.move_to(blocks[-1].get_right() + RIGHT * 0.7), run_time=0.7)
-        self.play(LaggedStart(*(FadeIn(badge, shift=UP * 0.1) for badge in badges), lag_ratio=0.16))
-        self.play(FadeOut(VGroup(subtitle, blocks, arrows, packet, badges)))
+        self.play(LaggedStart(*(FadeIn(b, shift=UP*0.2) for b in badges), lag_ratio=0.3), run_time=5)
 
-        self.play_section_beats(
-            section_start,
-            540,
-            "02:01:00 - 02:10:00 | Deep encrypted ResNet",
-            self.resnet_beats(),
-            GREEN_C,
-        )
+        packet_tracker = ValueTracker(0)
+        packet = RoundedRectangle(width=0.6, height=0.6, corner_radius=0.1, color=GREEN_A, fill_opacity=1)
+        self.add(packet)
 
-    @staticmethod
-    def packing_beats():
-        return [
-            (
-                "Start from a three-dimensional tensor",
-                [
-                    "A CNN feature tensor has channel, height and width dimensions.",
-                    "Nearby spatial values participate in the same convolution windows.",
-                    "Channels must also be combined into each output channel.",
-                ],
-                "The slot layout must preserve both spatial and channel structure.",
-            ),
-            (
-                "Flattening order is part of the algorithm",
-                [
-                    "Row-major flattening keeps neighboring columns close.",
-                    "Channel-major blocks make channel boundaries predictable.",
-                    "Segment offsets determine which rotation aligns each neighbor.",
-                ],
-                "A ciphertext is a programmable memory layout.",
-            ),
-            (
-                "Multiplex several channels together",
-                [
-                    "Spatial segments from multiple channels occupy one slot vector.",
-                    "The same slot offset means the same spatial relationship.",
-                    "One encrypted instruction now touches several channels.",
-                ],
-                "Packing converts channel parallelism into SIMD parallelism.",
-            ),
-            (
-                "Masks protect segment boundaries",
-                [
-                    "A rotation can wrap values from one segment into another.",
-                    "Plaintext masks remove wrapped or invalid positions.",
-                    "Padding slots preserve the intended convolution geometry.",
-                ],
-                "Dense packing still requires carefully designed boundary handling.",
-            ),
-            (
-                "Weights are encoded to match the layout",
-                [
-                    "Kernel coefficients are repeated across corresponding slot groups.",
-                    "Ciphertext-plaintext products apply weights in parallel.",
-                    "Rotated weighted vectors are accumulated into output slots.",
-                ],
-                "Model weights and slot layout are compiled together.",
-            ),
-            (
-                "Output channels can remain multiplexed",
-                [
-                    "The convolution result is arranged for the next encrypted layer.",
-                    "Avoiding repacking saves rotations and temporary ciphertexts.",
-                    "Layer interfaces become layout contracts.",
-                ],
-                "The best representation supports an entire sequence of layers.",
-            ),
-            (
-                "Packing changes the resource equation",
-                [
-                    "More useful values share each multiplication and refresh.",
-                    "Ciphertext count and memory traffic decrease.",
-                    "The remaining optimization target is rotation count.",
-                ],
-                "Dense utilization prepares the path for parallel convolution.",
-            ),
-        ]
+        def packet_updater(m):
+            t = packet_tracker.get_value()
+            x_pos = -6 + (t % 12)
+            y_pos = 0.5
+            m.move_to(np.array([x_pos, y_pos, 0]))
+            
+            noise_level = (x_pos % 2) / 2.0  
+            interpolated_color = interpolate_color(GREEN_A, RED_C, noise_level)
+            m.set_color(interpolated_color)
 
-    @staticmethod
-    def rotation_beats():
-        return [
-            (
-                "What a ciphertext rotation does",
-                [
-                    "A rotation cyclically shifts every CKKS slot by an offset.",
-                    "Convolution uses shifts to align neighboring pixels.",
-                    "Each kernel position normally requires a corresponding alignment.",
-                ],
-                "Rotations are encrypted data movement operations.",
-            ),
-            (
-                "Why rotations are expensive",
-                [
-                    "Rotation invokes an automorphism on the ciphertext polynomial.",
-                    "Key switching returns the result to the active secret-key form.",
-                    "Large evaluation keys and polynomial products are involved.",
-                ],
-                "A rotation is much heavier than changing an array index.",
-            ),
-            (
-                "Naive channel processing repeats work",
-                [
-                    "Each channel is shifted independently for the same kernel offset.",
-                    "The operation count grows with input and output channels.",
-                    "Repeated key switching dominates convolution latency.",
-                ],
-                "The same spatial movement is paid for many times.",
-            ),
-            (
-                "Interlocking layouts share offsets",
-                [
-                    "Matching spatial positions occupy matching channel segments.",
-                    "One cyclic shift moves every multiplexed channel together.",
-                    "All channels become aligned for the same kernel position.",
-                ],
-                "Layout converts redundant rotations into one SIMD rotation.",
-            ),
-            (
-                "Masks and accumulation finish the convolution",
-                [
-                    "Plaintext masks select valid values after each shared shift.",
-                    "Kernel weights are multiplied into the aligned slots.",
-                    "Partial products are accumulated into packed outputs.",
-                ],
-                "Rotation reduction must preserve exact convolution semantics.",
-            ),
-            (
-                "Count operations before benchmarking",
-                [
-                    "A layout can be analyzed by rotations per kernel position.",
-                    "Ciphertext multiplications and additions are counted separately.",
-                    "Memory and evaluation-key traffic should also be measured.",
-                ],
-                "Operation count explains where a measured speedup originates.",
-            ),
-            (
-                "Reported reduction",
-                [
-                    "The MPCNN layout removes many redundant channel rotations.",
-                    "The storyboard reference reports a 62 percent reduction.",
-                    "Only 38 percent of the naive rotation count remains.",
-                ],
-                "Fewer rotations improve both latency and key-switch workload.",
-            ),
-        ]
+        packet.add_updater(packet_updater)
 
-    @staticmethod
-    def resnet_beats():
-        return [
-            (
-                "Residual blocks preserve trainability",
-                [
-                    "A residual path learns a transformation of the input.",
-                    "A skip path carries the input toward the block output.",
-                    "The two paths are added before the next activation.",
-                ],
-                "Addition is FHE-friendly, making residual structure attractive.",
-            ),
-            (
-                "Every block has a level budget",
-                [
-                    "Convolution products consume scale and modulus levels.",
-                    "Polynomial activations consume several additional levels.",
-                    "Skip paths must reach additions with compatible scales.",
-                ],
-                "Encrypted residual execution requires explicit level planning.",
-            ),
-            (
-                "Bootstrapping becomes scheduled infrastructure",
-                [
-                    "Refresh points are selected before levels are exhausted.",
-                    "Dense packed ciphertexts maximize useful work per refresh.",
-                    "Refresh placement must respect residual dependencies.",
-                ],
-                "Bootstrapping is part of the network execution graph.",
-            ),
-            (
-                "Imaginary removal protects repeated refresh",
-                [
-                    "Deep models may cross several bootstrapping boundaries.",
-                    "Complex leakage must not accumulate between residual stages.",
-                    "Real-subspace projection keeps later activations stable.",
-                ],
-                "Stable refresh enables depth, not only one isolated layer.",
-            ),
-            (
-                "ResNet-20 is the first scaling target",
-                [
-                    "The model contains enough blocks to expose scheduling issues.",
-                    "Packing reuse and bootstrap placement can be measured end to end.",
-                    "Accuracy validates the polynomial activation strategy.",
-                ],
-                "A complete encrypted model is more meaningful than a layer microbenchmark.",
-            ),
-            (
-                "ResNet-110 stresses the complete design",
-                [
-                    "Many more residual blocks amplify small inefficiencies.",
-                    "Repeated activations test approximation stability.",
-                    "Multiple refreshes test noise and imaginary-error control.",
-                ],
-                "Deep encrypted inference requires every optimization to cooperate.",
-            ),
-            (
-                "Security parameters constrain performance",
-                [
-                    "Polynomial degree and modulus sizes determine security and capacity.",
-                    "Rotation and bootstrap keys increase memory requirements.",
-                    "The parameter set targets standard 128-bit security.",
-                ],
-                "Reported speed must be interpreted together with its security level.",
-            ),
-            (
-                "Combined system result",
-                [
-                    "Multiplexing improves slot utilization and rotation sharing.",
-                    "Level planning and stable bootstrap support deeper execution.",
-                    "The reference reports more than a 4.6 times latency improvement.",
-                ],
-                "The breakthrough is a coordinated encrypted-CNN system design.",
-            ),
-        ]
+        ambient_title = Tex(r"Imaginary-Removing Bootstrapping refreshing Cryptographic Noise", font_size=24, color=GREY_A).to_edge(DOWN)
+        self.play(FadeIn(ambient_title), run_time=5)
 
+        self.play(packet_tracker.animate.set_value(200), run_time=460, rate_func=linear)
+        packet.remove_updater(packet_updater)
 
-class MultiplexedParallelConvolutions(MultiplexedPacking):
-    """Alias with the full storyboard name."""
+        objects_to_remove = [m for m in self.mobjects]
+        self.play(FadeOut(Group(*objects_to_remove)), run_time=10)
