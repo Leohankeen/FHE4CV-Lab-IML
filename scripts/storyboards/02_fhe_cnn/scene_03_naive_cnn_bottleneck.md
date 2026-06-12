@@ -28,6 +28,7 @@
 ## III. QUẢN LÝ TÀI NGUYÊN BỔ TRỢ (ASSETS MAPPING)
 - Audio gốc: `assets/audio/act2_scene03_naive_bottleneck.mp3`
 - Tài liệu tham khảo lý thuyết: Slide giới thiệu "From Pytorch Models to SEAL FHE" (Phần phân tích hiệu năng tích chập thô sơ).
+- Tài liệu tham khảo lý thuyết: Slide giới thiệu "From Pytorch Models to SEAL FHE" (Phần phân tích hiệu năng tích chập thô sơ).
 
 ## IV. EXPANDED CONTENT BEATS CHO BẢN 10 PHÚT
 - Phân đoạn 3.1: SIMD model, scalar translation, tăng ciphertext count theo tensor, memory traffic và vai trò của data-layout contract.

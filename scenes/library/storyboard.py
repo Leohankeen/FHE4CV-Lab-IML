@@ -3,7 +3,25 @@ from pathlib import Path
 from manim import *
 
 from .constants import COLOR_MATH
+import os
+from manim import AnimationGroup, LaggedStart
 
+class FHESceneHelpers:
+    def safe_add_sound(self, scene, path):
+        if os.path.exists(path):
+            scene.add_sound(path)
+        else:
+            print(f"Missing audio: {path}")
+
+    def write_title_and_subtitle(self, title_text, subtitle_text, title_obj=None):
+        title = Text(title_text, font_size=42, color=WHITE).to_edge(UP) if title_obj is None else title_obj
+        subtitle = Text(subtitle_text, font_size=26, color=GREY_B).next_to(title, DOWN, buff=0.18)
+        self.play(Write(title), FadeIn(subtitle))
+        return title, subtitle
+
+    def reveal_group_optimized(self, group, lag_ratio=0.08, run_time=1.2):
+        # Uses LaggedStart for compact, GPU-friendly sequencing
+        self.play(LaggedStart(*(FadeIn(m, shift=UP*0.2) for m in group), lag_ratio=lag_ratio), run_time=run_time)
 
 def scene_time(scene):
     renderer = getattr(scene, "renderer", None)
