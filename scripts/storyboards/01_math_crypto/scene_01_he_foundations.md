@@ -8,8 +8,6 @@
 - Trạng thái Audio: Giọng nói AI TTS (Tiếng Anh) - Nhịp điệu: Chậm, học thuật, nhấn rõ các cụm "data in use", "homomorphic evaluation", "polynomial ring" và "R-L-W-E".
 
 ## II. KỊCH BẢN CHI TIẾT (STORYBOARD)
-- Ba khối `Lời thoại AI` trong phần II được nhóm lại từ transcript gốc: Topic 1-5, Topic 6-10 và Topic 11-15. Lời được phát trong video lấy từ 18 đoạn có timestamp tại phần V.
-
 ### Phân đoạn 1.1: Bài toán dữ liệu đang được sử dụng - Data in Use (00:00 - 05:00)
 - **Lời thoại AI (Audio Voiceover):**
   "Welcome to Act One. How can a client use cloud computation without revealing private data? The roadmap moves from plain values to encrypted objects. T-L-S protects information in transit, but an ordinary server decrypts it before computing. Homomorphic Encryption keeps the Secret Key with the client and allows only ciphertext to cross the trust boundary.
@@ -25,7 +23,7 @@
   Stronger privacy has a measurable cost. Six small plaintext values expand into a much larger ciphertext representation, so storage and communication increase. The two operation paths show a second limitation. Algebraic addition is directly supported, while a hidden branch such as if x is positive cannot be evaluated as ordinary control flow. The clock then shows the third cost: operations on encrypted polynomials require far more work than operations on native numbers. These constraints interact. Larger parameters may provide more security, precision, or multiplication depth, but they also increase memory use and runtime. A practical FHE system therefore chooses the value layout, supported operations, parameter sizes, and circuit depth together. Homomorphic Encryption is not free encryption around an unchanged program. It is a deliberate systems tradeoff."
 
 - **Hoạt ảnh Manim (Visual Actions):**
-  1. Sau phần mở đầu, chia màn hình thành `Data Owner` và `Outsourced Cloud`. Một ảnh dạng lưới pixel đi vào bộ nhớ máy chủ, chuyển đỏ, bị đường quét và biểu tượng con mắt đọc trực tiếp; đây là bằng chứng trực quan cho rủi ro `data in use`, không dùng ba ô lý thuyết.
+  1. Kết thúc intro bằng cách làm mờ hoàn toàn tiêu đề chính `Act 1.1 - Why Homomorphic Encryption?`; từ đây mỗi thí nghiệm chỉ giữ tiêu đề phụ của beat ở phía trên. Sau đó chia màn hình thành `Data Owner` và `Outsourced Cloud`. Một ảnh dạng lưới pixel đi vào bộ nhớ máy chủ, chuyển đỏ, bị đường quét và biểu tượng con mắt đọc trực tiếp; đây là bằng chứng trực quan cho rủi ro `data in use`, không dùng ba ô lý thuyết.
   2. Dựng trust boundary thật sự: ciphertext được phép bay qua đường biên, còn biểu tượng SecretKey thử đi qua thì mờ dần, bị chặn và quay lại Client. Con mắt ở Cloud bị gạch chéo vì không đọc được ciphertext.
   3. Minh họa giới hạn TLS bằng một đường hầm khóa: packet giữ trạng thái mã hóa khi đi trong tunnel nhưng khóa biến mất tại endpoint; packet biến lại thành lưới plaintext trong server memory và bị quan sát.
   4. Chạy lại cùng dữ liệu theo FHE: lưới plaintext biến thành đám điểm ciphertext, đi qua đường biên, làm bánh tính `Evaluate f` quay, trở về Client vẫn ở dạng ciphertext rồi mới biến thành score sau khi gặp SecretKey.
@@ -46,10 +44,10 @@
   The message type determines the scheme. Exact integers such as seven, twelve, and four move into the B-F-V or B-G-V region, where arithmetic is performed over modular integer messages. Decimal values such as zero point two five, negative one point four, and three point one two move into C-K-K-S. C-K-K-S accepts controlled approximation so that real or complex numerical workloads can be represented efficiently. The lower grid then shows its major performance feature: many values can occupy S-I-M-D slots inside one encoded polynomial and one ciphertext. A single homomorphic instruction can act across those slots in parallel. Computer vision relies heavily on real-valued tensors and repeated numerical operations, so approximate packed arithmetic is usually the better fit for this course. The approximation is managed, measured, and kept within an application tolerance."
 
 - **Hoạt ảnh Manim (Visual Actions):**
-  1. Chạy hai đường tính song song: đường plaintext và đường ciphertext cùng nhận giá trị 2, đi qua `f(x)=x^2+1`; ciphertext chỉ mở ở cuối và cả hai cùng cho kết quả 5.
+  1. Chạy hai đường tính song song: đường plaintext và đường ciphertext cùng nhận giá trị 2, đi qua `f(x)=x^2+1`; ciphertext chỉ mở ở cuối và cả hai cùng cho kết quả 5. Khi ổ khóa biến thành card `5.0`, mũi tên đỏ thu ngắn và dừng đúng tại mép trái của card, không xuyên hoặc che kết quả.
   2. Cho ciphertext khóa kín đi xuống từng bậc modulus sau mỗi cổng nhân. Khi gần hết bậc, ciphertext đi qua BootstrappingGate và trở lại tầng cao nhất.
   3. Cho ciphertext lao vào `if x > 0` rồi va vào tường đỏ và rung lại. Sau đó chuyển nó sang một đường mạch có cổng `+` và `×`, nơi token đi xuyên suốt tới output.
-  4. Dùng feature map ciphertext màu đỏ và cột model weight plaintext màu xanh cùng đi vào cổng nhân; output vẫn là các điểm ciphertext, con mắt phía server tiếp tục bị gạch chéo.
+  4. Dùng feature map ciphertext màu đỏ đi vào cổng nhân từ bên trái. Bốn model weight plaintext `0.3, -0.8, 1.2, 0.5` xếp thành một hàng ngang phía trên ký hiệu `X`, rồi đi xuống bằng một mũi tên đủ dài và rõ; output vẫn là các điểm ciphertext, con mắt phía server tiếp tục bị gạch chéo.
   5. Cho các số nguyên tự di chuyển vào vùng BFV/BGV, còn vector số thập phân tự di chuyển vào vùng CKKS rồi lan ra nhiều slot SIMD; lựa chọn scheme được chứng minh bằng loại dữ liệu thực sự đi qua.
 
 ### Phân đoạn 1.3: Vành đa thức, RLWE và trực giác về nhiễu (10:00 - 15:00)
@@ -67,10 +65,10 @@
   The final transformation connects this foundation to the next scene. A real-valued vector first enters a set of logical C-K-K-S slots. The encoder maps those slot values into a polynomial representation and records a scale that preserves useful fractional precision. Encryption then turns the encoded plaintext into a tuple of noisy ring polynomials. The evaluator receives that ciphertext and applies only operations supported by the planned arithmetic circuit. Throughout the path, the visible numerical meaning and the polynomial object are different layers of the same computation. The client reasons about vectors and approximate results, while the cryptographic library manipulates coefficients, moduli, levels, and keys. Scene 2 will open the encoder in detail and show how slot packing, scale, rotations, and rescaling make this representation practical for numerical workloads."
 
 - **Hoạt ảnh Manim (Visual Actions):**
-  1. Cho bốn số thực rời vector, bay tới các vị trí hệ số trên trục đa thức, mọc thành các stem rồi được cuộn vào quotient ring; người xem thấy rõ vector trở thành biểu diễn đa thức.
+  1. Cho bốn số thực rời vector, bay tới các vị trí hệ số trên trục đa thức và mọc thành các stem. Sau đó bốn điểm hệ số tập hợp thành cụm `2 x 2` hoàn toàn bên trong quotient-ring circle rồi cùng quay quanh tâm vòng; không điểm nào đi ra ngoài hoặc rơi xuống dưới vòng tròn.
   2. Đặt các lũy thừa quanh một vòng tròn. Token `X^(N+2)` chạy trọn một vòng, đổi màu khi vượt `X^N`, rồi đáp xuống vị trí `X^2` với nhãn đổi thành `-X^2`.
   3. Cho ba dòng vật chất `secret`, `random sample`, và các chấm `small error` cùng chảy vào bộ trộn; bộ trộn quay và tách ra hai đám hệ số ciphertext khác màu.
-  4. Hiện đồng thời ba thanh `Modulus`, `Levels`, `Precision`. Mỗi phép nhân làm các thanh co theo mức khác nhau trong khi quầng error quanh ciphertext nở ra và tiến gần vạch đỏ.
+  4. Hiện đồng thời ba thanh `Modulus`, `Levels`, `Precision`. Ở bên phải, ổ khóa ciphertext nằm giữa quầng error màu xám, còn dấu `X` là một badge vàng nhỏ đặt tách biệt ở góc trên-trái bên trong quầng. Mỗi phép nhân làm các thanh co theo mức khác nhau, đồng thời cả ổ khóa, quầng error và badge dịch chuyển cùng nhau về phía vạch đỏ.
   5. Kết bằng một phép biến hình liên tục: điểm vector sang slot, slot thành đường đa thức, đường đa thức tách thành tuple ciphertext, tuple đi vào bộ Evaluate đang quay. Đây là cầu nối trực tiếp sang Scene 2.
 
 ## III. QUẢN LÝ TÀI NGUYÊN BỔ TRỢ (ASSETS MAPPING)
@@ -78,11 +76,12 @@
 - Thư viện Manim dùng chung: `scenes/library/constants.py`, `scenes/library/ehe_primitives.py`, `scenes/library/storyboard.py`
 - Tài liệu tham khảo lý thuyết: Microsoft SEAL README; các ví dụ nền tảng `native/examples/1_bfv_basics.cpp`, `2_encoders.cpp` và `3_levels.cpp`.
 
-## IV. EXPANDED CONTENT BEATS CHO BẢN 15 PHÚT
+## IV. EXPANDED CONTENT BEATS
 - Phân đoạn 1.1: ba trạng thái dữ liệu, giới hạn của TLS, mô hình honest-but-curious, trust boundary, quyền sở hữu Secret Key và chi phí của FHE.
 - Phân đoạn 1.2: bất biến đúng đắn, arithmetic circuit, phép toán được hỗ trợ, BFV/BGV so với CKKS, public-model/private-input và multiplicative depth.
 - Phân đoạn 1.3: quotient polynomial ring, modulo coefficients, negacyclic multiplication, trực giác RLWE, vai trò của error và cầu nối encode-encrypt.
+- Tiêu đề chính của scene chỉ xuất hiện trong intro và phải biến mất hoàn toàn trước visual experiment đầu tiên; các beat sau chỉ hiển thị tiêu đề phụ ở phía trên như Scene 2.
 - Mỗi phân đoạn gồm năm visual experiment riêng. Từ khoảng 00:30 trở đi không dùng layout ba ô chữ lặp lại; mỗi khẳng định phải được chứng minh bằng chuyển động của dữ liệu, khóa, ciphertext, cổng mạch, mức tài nguyên hoặc hệ số đa thức.
 - Chữ trên màn hình chỉ giữ vai trò nhãn ngắn, tiêu đề và một câu kết luận; phần giải thích đầy đủ nằm trong voiceover.
-- Nhịp chuyển động chính dùng khoảng `0.8 - 1.8 giây` cho mỗi hành động với easing tự nhiên; không kéo một thao tác đơn giản dài theo toàn bộ voiceover. Thời gian narration còn lại dùng các focus pulse ngắn trên đúng vật thể đang được giải thích.
+- Nhịp chuyển động cho mỗi hành động với easing tự nhiên; không kéo một thao tác đơn giản dài theo toàn bộ voiceover. Thời gian narration còn lại dùng các focus pulse ngắn trên đúng vật thể đang được giải thích.
 - Mọi vật thể của visual experiment phải nằm giữa vùng tiêu đề và câu kết luận. Tiêu đề/kết luận luôn ở lớp trước; sau mỗi beat phải xóa toàn bộ mobject tạm trước khi dựng beat tiếp theo để không chồng, che hoặc sót hoạt ảnh.

@@ -5,7 +5,7 @@
 ## I. THÔNG TIN METADATA & ĐỒ HỌA CHUẨN
 - Hệ màu sử dụng: COLOR_PLAINTEXT (Blue), COLOR_CIPHERTEXT (Red), COLOR_ENCRYPTION (Yellow), COLOR_MATH (White).
 - Đối tượng Manim chủ đạo: PlaintextBlock, CiphertextBlock, SlotGrid, vector cards và modulus ladder từ `scenes/library/`.
-- Trạng thái Audio: Giọng nói AI TTS (Tiếng Anh), đồng bộ thành 15 đoạn trong đúng `900.00 giây`; tốc độ đọc mục tiêu `130 từ/phút`, với phần cuối mỗi slot dành cho focus cue và chuyển cảnh tự nhiên. Đọc CKKS thành "C-K-K-S" và SIMD thành "sim-dee".
+- Trạng thái Audio: Giọng nói AI TTS (Tiếng Anh), nối tự nhiên từ Scene 01, mục tiêu `130 từ/phút`, với phần cuối mỗi slot dành cho focus cue và chuyển cảnh tự nhiên. Đọc CKKS thành "C-K-K-S" và SIMD thành "sim-dee".
 
 ## II. KỊCH BẢN CHI TIẾT (STORYBOARD)
 - Ba khối `Lời thoại AI` bên dưới là bản transcript mới được nhóm theo từng chương. Phần V chia chính các câu này thành 15 `AUDIO_SEGMENT` khớp trực tiếp với 15 visual beat.
@@ -69,16 +69,15 @@
 
 ## III. QUẢN LÝ TÀI NGUYÊN BỔ TRỢ (ASSETS MAPPING)
 - Audio đồng bộ 15 phút: `assets/audio/01_math_crypto/scene_02_ckks_encoding.mp3`
-- Transcript kèm rate và mức lấp đầy từng slot: `assets/audio/01_math_crypto/scene_02_ckks_encoding.txt`
 - Thư viện Manim dùng chung: SlotGrid và các màu chuẩn từ `scenes/library/ehe_primitives.py`, `scenes/library/constants.py`
 - Tài liệu tham khảo lý thuyết: Microsoft SEAL `native/examples/2_encoders.cpp`, `3_levels.cpp`, `5_ckks_basics.cpp` và `6_rotation.cpp`.
 
-## IV. EXPANDED CONTENT BEATS CHO BẢN 15 PHÚT
+## IV. EXPANDED CONTENT BEATS
 - Phân đoạn 2.1: exact versus approximate schemes, scale-and-round, decoding, nguồn sai số, absolute/relative error và tolerance.
 - Phân đoạn 2.2: canonical embedding, N/2 complex slots, SIMD add/multiply, broadcast constants, masks, rotations và packed reduction.
 - Phân đoạn 2.3: polynomial modulus degree, RNS primes, SEALContext levels, parms_id, scale growth, rescale và cấu hình ví dụ 60-40-40-60.
 - Mỗi phân đoạn gồm năm visual experiment độc lập; mỗi khẳng định phải được chứng minh bằng chuyển động của giá trị, slot, token, scale bar, prime hoặc level thay vì bằng các ô chứa đoạn văn.
 - Chữ trên màn hình chỉ gồm tiêu đề beat, nhãn ngắn trên đối tượng và một câu kết luận. Phần giải thích dài nằm trong voiceover.
-- Chuyển động nhân quả chính dùng khoảng `0.85 - 1.35 giây`, có easing tự nhiên. Không kéo một phép di chuyển đơn giản chạy chậm theo toàn bộ narration; khoảng lời còn lại dùng focus cue đổi stroke ngắn trên đúng đối tượng, không phóng kích thước vì có thể làm các nhóm sát nhau bị chèn.
+- Nhịp chuyển động cho mỗi hành động với easing tự nhiên. Không kéo một phép di chuyển đơn giản chạy chậm theo toàn bộ narration; khoảng lời còn lại dùng focus cue đổi stroke ngắn trên đúng đối tượng, không phóng kích thước vì có thể làm các nhóm sát nhau bị chèn.
 - Toàn bộ visual nằm giữa vùng tiêu đề và footer. Tiêu đề, rule và footer luôn được đưa lên lớp trước; kết thúc mỗi beat phải xóa toàn bộ mobject tạm trước khi dựng beat tiếp theo.
 - Không giữ progress cursor, thẻ lý thuyết hoặc đối tượng từ beat trước. Các nhóm trái/phải, trên/dưới phải có khoảng trống đủ để mũi tên, label và phép biến hình không chèn hoặc che nhau.

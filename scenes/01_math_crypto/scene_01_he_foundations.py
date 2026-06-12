@@ -174,17 +174,22 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
         return pixels
 
     def lock_icon(self, color=COLOR_ENCRYPTION):
-        shackle = Arc(radius=0.3, start_angle=0, angle=PI, color=color, stroke_width=5)
-        shackle.shift(UP * 0.18)
         body = RoundedRectangle(
             width=0.72,
-            height=0.58,
+            height=0.5,
             corner_radius=0.08,
             color=color,
             fill_color=color,
             fill_opacity=0.2,
-        ).shift(DOWN * 0.12)
-        return VGroup(shackle, body)
+            stroke_width=5,
+        ).shift(DOWN * 0.16)
+        shackle = Arc(radius=0.25, start_angle=0, angle=PI, color=color, stroke_width=5)
+        shackle.shift(UP * 0.1)
+        legs = VGroup(
+            Line(LEFT * 0.25 + UP * 0.1, LEFT * 0.25 + DOWN * 0.04, color=color, stroke_width=5),
+            Line(RIGHT * 0.25 + UP * 0.1, RIGHT * 0.25 + DOWN * 0.04, color=color, stroke_width=5),
+        )
+        return VGroup(body, shackle, legs)
 
     def eye_icon(self, color=RED_C):
         upper = ArcBetweenPoints(
@@ -433,6 +438,12 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
         cipher_result.move_to([4.0, -0.95, 0])
         decrypted = self.card("5.0", GREEN_C, 1.05, 0.68, 27)
         decrypted.move_to(cipher_result)
+        decrypted_arrow = Arrow(
+            cipher_gate.get_right(),
+            decrypted.get_left(),
+            buff=0.15,
+            color=RED_C,
+        )
 
         arrows = VGroup(
             Arrow(input_value.get_right(), plain_gate.get_left(), buff=0.15, color=BLUE_C),
@@ -479,7 +490,11 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
             run_time=step,
             rate_func=smooth,
         )
-        self.play(Transform(cipher_result, decrypted), run_time=step)
+        self.play(
+            Transform(cipher_result, decrypted),
+            Transform(arrows[3], decrypted_arrow),
+            run_time=step,
+        )
         self.play(Write(equality), Circumscribe(VGroup(plain_result, cipher_result), color=GREEN_C), run_time=step)
         return VGroup(
             plain_label,
@@ -558,13 +573,13 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
                 for v in (0.3, -0.8, 1.2, 0.5)
             ]
         )
-        weights.arrange(DOWN, buff=0.16).shift(UP * 0.8)
         multiply = VGroup(Circle(radius=0.72, color=YELLOW_D), Text("x", font_size=38, color=YELLOW_D))
         multiply[1].move_to(multiply[0])
+        weights.arrange(RIGHT, buff=0.28).next_to(multiply, UP, buff=0.72)
         output = VGroup(*[Dot(radius=0.09, color=RED_C) for _ in range(12)])
         output.arrange_in_grid(rows=3, cols=4, buff=0.14).shift(RIGHT * 4.5)
         feature_path = Arrow(feature.get_right(), multiply.get_left(), buff=0.15, color=RED_C)
-        weight_path = Arrow(weights.get_bottom(), multiply.get_top(), buff=0.15, color=BLUE_C)
+        weight_path = Arrow(weights.get_bottom(), multiply.get_top(), buff=0.08, color=BLUE_C)
         output_path = Arrow(multiply.get_right(), output.get_left(), buff=0.15, color=RED_C)
         eye = self.eye_icon().scale(0.65).next_to(feature, DOWN, buff=0.4)
         cross = Cross(eye, stroke_color=RED_C)
@@ -656,7 +671,8 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
         self.play(LaggedStart(*(TransformFromCopy(value, dot) for value, dot in zip(vector, coeffs)), lag_ratio=0.12), run_time=step)
         self.play(LaggedStart(*(Create(stem) for stem in stems), lag_ratio=0.1), run_time=step)
         self.play(Create(ring), run_time=step)
-        self.play(TransformFromCopy(coeffs, wrapped), Rotate(wrapped, angle=PI / 2), run_time=step)
+        self.play(TransformFromCopy(coeffs, wrapped), run_time=step)
+        self.play(Rotate(wrapped, angle=PI / 2, about_point=ring.get_center()), run_time=step)
         return VGroup(vector, axes, coeffs, stems, ring, wrapped)
 
     def demo_ring_2(self, accent, duration):
@@ -750,9 +766,14 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
             self.resource_bar("levels", 0.82, YELLOW_D),
             self.resource_bar("precision", 0.88, GREEN_C),
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.45).shift(LEFT * 2)
-        token = self.lock_icon(RED_C).scale(0.55).shift(RIGHT * 3.8)
-        halo = Circle(radius=0.62, color=GREY_B, stroke_opacity=0.4).move_to(token)
-        multiply = Text("x", font_size=40, color=YELLOW_D).next_to(token, UP, buff=0.4)
+        state_center = RIGHT * 3.65
+        halo = Circle(radius=0.78, color=GREY_B, stroke_opacity=0.4).move_to(state_center)
+        token = self.lock_icon(RED_C).scale(0.48).move_to(state_center)
+        multiply = VGroup(
+            Circle(radius=0.19, color=YELLOW_D, fill_color=YELLOW_D, fill_opacity=0.08),
+            Text("x", font_size=24, color=YELLOW_D),
+        ).move_to(state_center + UL * 0.42)
+        multiply[1].move_to(multiply[0])
         self.play(LaggedStart(*(FadeIn(bar) for bar in bars), lag_ratio=0.15), FadeIn(token), run_time=step)
         self.play(FadeIn(multiply), FadeIn(halo), run_time=step)
         self.play(
@@ -770,7 +791,11 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
             run_time=step,
         )
         threshold = DashedLine(UP * 1.4, DOWN * 1.4, color=RED_C).shift(RIGHT * 5.0)
-        self.play(Create(threshold), token.animate.shift(RIGHT * 0.75), run_time=step)
+        self.play(
+            Create(threshold),
+            VGroup(token, halo, multiply).animate.shift(RIGHT * 0.48),
+            run_time=step,
+        )
         self.play(Indicate(bars, color=YELLOW_D), Flash(threshold, color=RED_C), run_time=step)
         return VGroup(bars, token, halo, multiply, threshold)
 
@@ -825,14 +850,14 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
         self.play(
             FadeOut(act),
             FadeOut(rule),
-            title.animate.scale(0.58).to_edge(UP, buff=0.18),
+            FadeOut(title),
             run_time=1,
         )
-        self.lesson_title = title
+        self.lesson_title = None
         return title
 
     def show_chapter_plate(self, title, image_path, summary, accent):
-        subtitle = Text("Visual roadmap", font_size=25, color=GREY_B).next_to(title, DOWN, buff=0.2)
+        subtitle = Text("Visual roadmap", font_size=25, color=GREY_B).to_edge(UP, buff=0.72)
         stages = VGroup(
             self.card("PLAIN\nVALUES", COLOR_PLAINTEXT, 2.3, 1.25, 23),
             self.card("CRYPTO\nTRANSFORM", COLOR_ENCRYPTION, 2.3, 1.25, 23),
@@ -853,7 +878,7 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
 
     def show_trust_boundary(self, title):
         subtitle = Text("Protect data while the cloud is computing", font_size=27, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.2)
+        subtitle.to_edge(UP, buff=0.72)
         row_y = -0.25
         client = self.card("TRUSTED\nCLIENT", COLOR_PLAINTEXT, 2.05, 1.25, 23)
         client.move_to([-5.35, row_y, 0])
@@ -897,7 +922,7 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
 
     def show_data_in_use_problem(self, title):
         subtitle = Text("Encryption protects three different data states", font_size=27, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.2)
+        subtitle.to_edge(UP, buff=0.72)
         states = VGroup(
             self.card("DATA AT REST\nEncrypted disk", COLOR_PLAINTEXT, 3.2, 1.15, 21),
             self.card("DATA IN TRANSIT\nTLS channel", COLOR_ENCRYPTION, 3.2, 1.15, 21),
@@ -993,7 +1018,7 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
 
     def show_homomorphic_equation(self, title):
         subtitle = Text("The cloud transforms ciphertext, not plaintext", font_size=27, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.2)
+        subtitle.to_edge(UP, buff=0.72)
         plain = self.card("x", COLOR_PLAINTEXT, 1.3, 1.0, 34).shift(LEFT * 5)
         encrypt = self.card("Encrypt", COLOR_ENCRYPTION, 1.9, 1.0, 23).shift(LEFT * 2.7)
         cipher = self.card("Enc(x)", COLOR_CIPHERTEXT, 1.8, 1.0, 28)
@@ -1022,7 +1047,7 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
 
     def show_scheme_and_depth(self, title):
         subtitle = Text("Choose a scheme for the value type", font_size=27, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.2)
+        subtitle.to_edge(UP, buff=0.72)
         schemes = VGroup(
             self.card("BFV\nexact integers", BLUE_D, 2.45, 1.15, 22),
             self.card("BGV\nexact integers", BLUE_D, 2.45, 1.15, 22),
@@ -1107,7 +1132,7 @@ class HomomorphicEncryptionFoundations(StoryboardScene):
 
     def show_ring_picture(self, title):
         subtitle = Text("A vector is encoded before it becomes ciphertext", font_size=27, color=GREY_B)
-        subtitle.next_to(title, DOWN, buff=0.2)
+        subtitle.to_edge(UP, buff=0.72)
         pipeline = VGroup(
             self.card("real vector", COLOR_PLAINTEXT, 1.8, 0.78, 20),
             self.card("encode", COLOR_ENCRYPTION, 1.5, 0.78, 20),

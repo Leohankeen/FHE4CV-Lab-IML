@@ -43,6 +43,8 @@
       "storyboard": "scripts/storyboards/01_math_crypto/scene_03_ciphertext_operations.md",
       "output": "assets/audio/01_math_crypto/scene_03_ciphertext_operations.mp3",
       "target_seconds": 900,
+      "target_wpm": 130,
+      "target_wpm_tolerance": 0.025,
       "sections": [
         "Ciphertext components and metadata",
         "Addition, multiplication, and relinearization",
@@ -57,6 +59,8 @@
       "storyboard": "scripts/storyboards/01_math_crypto/scene_04_keys_and_seal_pipeline.md",
       "output": "assets/audio/01_math_crypto/scene_04_keys_and_seal_pipeline.mp3",
       "target_seconds": 900,
+      "target_wpm": 130,
+      "target_wpm_tolerance": 0.025,
       "sections": [
         "Secret, public, relinearization, and Galois keys",
         "Core Microsoft SEAL objects",

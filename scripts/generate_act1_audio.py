@@ -298,16 +298,19 @@ async def synthesize_timed_scene(
                 if target_wpm is not None
                 else segment["duration"] * target_speech_fill
             )
-            speech_duration = active_audio_duration(speech)
-            speech_fill = speech_duration / segment["duration"]
-            measured_wpm = word_count * 60.0 / speech_duration
-
-            needs_refit = (
-                abs(measured_wpm - target_wpm) / target_wpm > target_wpm_tolerance
-                if target_wpm is not None
-                else speech_fill < min_speech_fill or speech_fill > max_speech_fill
-            )
-            if needs_refit:
+            for _ in range(3):
+                speech_duration = active_audio_duration(speech)
+                speech_fill = speech_duration / segment["duration"]
+                measured_wpm = word_count * 60.0 / speech_duration
+                needs_refit = (
+                    abs(measured_wpm - target_wpm) / target_wpm
+                    > target_wpm_tolerance
+                    if target_wpm is not None
+                    else speech_fill < min_speech_fill
+                    or speech_fill > max_speech_fill
+                )
+                if not needs_refit:
+                    break
                 selected_rate = fitted_rate(
                     selected_rate,
                     speech_duration,
@@ -320,9 +323,10 @@ async def synthesize_timed_scene(
                     voice,
                     selected_rate,
                 )
-                speech_duration = active_audio_duration(speech)
-                speech_fill = speech_duration / segment["duration"]
-                measured_wpm = word_count * 60.0 / speech_duration
+
+            speech_duration = active_audio_duration(speech)
+            speech_fill = speech_duration / segment["duration"]
+            measured_wpm = word_count * 60.0 / speech_duration
 
             if (
                 target_wpm is not None
