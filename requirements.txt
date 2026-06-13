@@ -24,4 +24,4 @@ matplotlib
 tqdm
 
 # Homomorphic encryption (TenSEAL - CKKS)
-tenseal
+# tenseal

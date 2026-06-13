@@ -226,4 +226,8 @@ media/
 .DS_Store
 Thumbs.db
 
+# Ignore generated media files
+*.mp4
+*.mp3
+deliverables/
 
