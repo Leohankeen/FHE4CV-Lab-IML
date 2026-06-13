@@ -1,5 +1,5 @@
 {
-  "name": "demo_xray_linear_triage",
+  "name": "trained_xray_linear_triage",
   "feature_names": [
     "mean_intensity",
     "std_intensity",
@@ -13,18 +13,18 @@
     "dark_ratio"
   ],
   "weights": [
-    -1.15,
-    1.25,
-    -0.35,
-    -0.35,
-    0.25,
-    0.25,
-    -0.55,
-    3.2,
-    0.6,
-    0.9
+    -2.6680995554457785,
+    15.134957568206591,
+    -4.246836933588417,
+    -4.278665097191289,
+    0.9443077666369002,
+    1.2271778812989498,
+    -4.547315445774645,
+    -70.87924502235546,
+    -0.11181199189945101,
+    10.471479951244026
   ],
-  "bias": 0.1,
+  "bias": 5.649419669225287,
   "threshold": 0.5,
-  "description": "Fixed educational weights for privacy-preserving X-ray triage scoring. Not trained for clinical diagnosis."
+  "description": "Plaintext logistic-regression model exported for TenSEAL encrypted scoring. Labels source: deterministic pseudo-labels from image statistics. Not validated for clinical use."
 }

@@ -46,7 +46,7 @@ class XRayTriage(StoryboardScene):
         self.wait(51)
         self.add_sound("./assets/audio/03_demos/04_01_2.mp3")
         # 1. Tải ảnh X-quang (Căn theo tâm 3.6)
-        xray_img = self.get_xray_image("./assets/probe_face.jpg").move_to(LEFT * 3.6 + UP * 1.2)
+        xray_img = self.get_xray_image("./assets/X-quang.jpg").move_to(LEFT * 3.6 + UP * 1.2)
         self.play(FadeIn(xray_img))
         self.wait(25)
 
