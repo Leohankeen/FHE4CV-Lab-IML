@@ -1,203 +1,119 @@
-# FHE4CV-Lab-IML
+# Computer Vision over Homomorphically Encrypted Data
 
-Dự án minh họa chủ đề **Computer Vision over Homomorphically Encrypted Data**
-với case thực tế: **xử lý ảnh X-ray y tế bảo mật**. Project dùng
-**TenSEAL/CKKS** thay cho việc gọi trực tiếp Microsoft SEAL để có API Python
-phù hợp với demo, notebook và Manim.
+Dự án được minh họa bằng Manim, CKKS và TenSEAL. Nội dung được tổ chức thành ba Act:
 
-Ý tưởng cốt lõi:
+1. **Act 1 - Mathematical and Cryptographic Foundations**: nền tảng HE, CKKS, ciphertext operations, key management và Microsoft SEAL workflow.
+2. **Act 2 - FHE-Friendly CNN**: ReLU barrier, polynomial approximation, bottleneck của CNN native và multiplexed convolution.
+3. **Act 3 - Practical Demos**: CryptoFace, HERS, Private Image Matching và Medical X-Ray FHE.
 
-1. Bệnh viện/client giữ ảnh X-ray gốc ở local.
-2. Client trích xuất vector đặc trưng nhỏ từ ảnh và mã hóa bằng CKKS.
-3. Cloud server chỉ nhận ciphertext và tính linear triage score:
-   `Enc(x) dot w + b = Enc(score)`.
-4. Chỉ client/doctor có secret key mới giải mã score.
+Repo cũng chứa pipeline TenSEAL độc lập cho bài toán X-ray:
 
-> Prototype này dùng một score tuyến tính có trọng số cố định để minh họa
-> quyền riêng tư và sai số CKKS. Đây không phải mô hình chẩn đoán lâm sàng.
+```text
+X-ray image -> local feature extraction -> CKKS encryption -> encrypted linear score on cloud -> client decryption
+```
 
-## Cấu trúc chính
+> Đây là prototype phục vụ giảng dạy và minh họa, không phải hệ thống chẩn
+> đoán lâm sàng.
 
-- [requirements.txt](requirements.txt): phụ thuộc Manim, OpenCV, Torch, TenSEAL.
-- [configs/manim.cfg](configs/manim.cfg): cấu hình render Manim mặc định.
-- [scripts/medical_fhe_pipeline.py](scripts/medical_fhe_pipeline.py): pipeline
-  X-ray -> feature -> TenSEAL CKKS encrypted scoring -> decrypt result.
-- [scripts/benchmark_tenseal.py](scripts/benchmark_tenseal.py): benchmark
-  thời gian mã hóa, encrypted dot product, giải mã, sai số CKKS.
-- [scripts/train_plaintext_linear_model.py](scripts/train_plaintext_linear_model.py):
-  train/export logistic-regression model plaintext sang JSON dùng cho FHE demo.
-- [scripts/storyboards/02_fhe_cnn/](scripts/storyboards/02_fhe_cnn):
-  storyboard Act 2 cho phần FHE-friendly CNN, gồm lời thoại, visual actions và
-  mapping audio.
-- [scripts/render_act2_fhe_cnn.ps1](scripts/render_act2_fhe_cnn.ps1):
-  render batch 4 scene Manim của Act 2.
-- [models/triage_linear_model.json](models/triage_linear_model.json): model
-  artifact mặc định, dễ giải thích, gồm feature order, weights, bias, threshold.
-- [models/triage_linear_model_trained_demo.json](models/triage_linear_model_trained_demo.json):
-  model logistic-regression demo export từ script training với nhãn demo.
-- [notebooks/medical_fhe_tenseal_walkthrough.ipynb](notebooks/medical_fhe_tenseal_walkthrough.ipynb):
-  notebook giải thích từng bước từ ảnh đến encrypted inference.
-- [scenes/medical_fhe_pipeline_scene.py](scenes/medical_fhe_pipeline_scene.py):
-  scene Manim giải thích luồng bảo mật.
-- [scenes/fhe4cv_full_explainer.py](scenes/fhe4cv_full_explainer.py):
-  scene Manim dài hơn cho video thuyết trình hoàn chỉnh.
-- [scenes/02_fhe_cnn/](scenes/02_fhe_cnn):
-  4 scene Manim về ReLU barrier, polynomial approximation, naive CNN
-  bottleneck và multiplexed parallel convolutions.
-- [docs/project_report_vi.md](docs/project_report_vi.md): báo cáo kỹ thuật
-  tiếng Việt cho phần thuyết trình/nộp bài.
-- [docs/labels_format.md](docs/labels_format.md): định dạng CSV nhãn cho
-  training/export model.
-- [scenes/library/](scenes/library): primitives dùng lại cho Manim.
-- [tests/test_medical_fhe_pipeline.py](tests/test_medical_fhe_pipeline.py):
-  kiểm thử tiền xử lý và plaintext scoring.
-- `data/chestxray_sample/`: ảnh X-ray mẫu local để demo.
+## Cấu trúc dự án
 
-Cài đặt nhanh (Windows)
-1. Tạo môi trường ảo và kích hoạt:
+```text
+FHE4CV-Lab-IML/
+|-- assets/
+|   |-- audio/
+|   |   |-- 01_math_crypto/
+|   |   |-- 02_fhe_cnn/
+|   |   `-- 03_demos/
+|   `-- image/03_demos/
+|-- configs/
+|   `-- manim.cfg
+|-- data/
+|   `-- chestxray_sample/
+|-- docs/
+|-- models/
+|-- notebooks/
+|-- outputs/
+|-- scenes/
+|   |-- 01_math_crypto/
+|   |-- 02_fhe_cnn/
+|   |-- 03_demos/
+|   `-- library/
+|-- scripts/
+|   |-- audio_manifest/
+|   |   |-- act1_audio_manifest.json
+|   |   |-- act2_audio_manifest.json
+|   |   `-- act3_audio_manifest.json
+|   |-- storyboards/
+|   |   |-- 01_math_crypto/
+|   |   |-- 02_fhe_cnn/
+|   |   `-- 03_demos/
+|   |-- build_scene.py
+|   |-- generate_audio.py
+|   |-- validate_audio.py
+|   |-- medical_fhe_pipeline.py
+|   |-- benchmark_tenseal.py
+|   `-- train_plaintext_linear_model.py
+|-- tests/
+|-- README.md
+`-- requirements.txt
+```
+
+Các thành phần quan trọng:
+
+- [scenes/](scenes): toàn bộ scene Manim của ba Act.
+- [scripts/storyboards/](scripts/storyboards): lời thoại AI, timeline và mô tả
+  hoạt ảnh tương ứng với từng scene.
+- [scripts/audio_manifest/](scripts/audio_manifest): ánh xạ storyboard, scene
+  và file audio.
+- [scripts/build_scene.py](scripts/build_scene.py): build một scene bất kỳ từ
+  đường dẫn `.py`.
+- [scripts/generate_audio.py](scripts/generate_audio.py): tạo narration từ
+  phần `Lời thoại AI` trong storyboard.
+- [scripts/validate_audio.py](scripts/validate_audio.py): kiểm tra manifest,
+  storyboard, scene và các file audio.
+- [scenes/library/](scenes/library): primitive và helper Manim dùng chung.
+- [configs/manim.cfg](configs/manim.cfg): cấu hình Manim 1920x1080, 60 FPS.
+
+## Cài đặt
+
+### Windows PowerShell
+
+Khuyến nghị dùng Python 3.11 hoặc 3.12:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r requirements.txt
 ```
 
-2. Cập nhật pip và cài đặt phụ thuộc:
+`edge-tts` đã có trong `requirements.txt`. TenSEAL đang là dependency tùy
+chọn; cài thêm nếu cần chạy encrypted X-ray pipeline:
 
 ```powershell
-python -m pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
+python -m pip install tenseal
 ```
 
-Ghi chú quan trọng cho TenSEAL
-- Trên Windows, `tenseal` có thể cần trình biên dịch C++ (Visual Studio Build Tools) hoặc cài qua `conda` để tránh lỗi build. Nếu pip cài thất bại, thử:
+Nếu TenSEAL không cài được bằng pip trên Windows, có thể chuẩn bị toolchain qua
+Conda:
 
 ```powershell
 conda create -n fhe4cv python=3.10 -y
 conda activate fhe4cv
 conda install -c conda-forge cmake eigen pybind11
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+python -m pip install tenseal
 ```
 
-Ghi chú cho Manim trên Windows:
-- Nên dùng Python 3.11 hoặc 3.12. Virtualenv Python 3.13 có thể lỗi khi Manim
-  import Pydub vì `audioop` đã bị loại khỏi standard library.
-- Nếu đã dùng Python 3.13 và gặp lỗi `No module named 'audioop'` hoặc
-  `No module named 'pyaudioop'`, chạy:
+Với Python 3.13, nếu Manim báo thiếu `audioop`:
 
 ```powershell
 python -m pip install audioop-lts
 ```
 
-  Dependency này cũng đã được thêm vào `requirements.txt` với marker cho
-  Python 3.13.
-- Nếu render bị lỗi encoding config trên Windows, đảm bảo `configs/manim.cfg`
-  chỉ chứa comment ASCII như file hiện tại.
-
-Hướng dẫn nhanh sử dụng
-- Chạy demo plaintext trước để kiểm tra tiền xử lý:
-
-```powershell
-python scripts/medical_fhe_pipeline.py --plaintext-only
-```
-
-- Chạy demo mã hóa bằng TenSEAL/CKKS:
-
-```powershell
-python scripts/medical_fhe_pipeline.py
-```
-
-- Chạy demo với model artifact cụ thể:
-
-```powershell
-python scripts/medical_fhe_pipeline.py --model-path models/triage_linear_model.json
-```
-
-- Chạy demo với model trained-demo:
-
-```powershell
-python scripts/medical_fhe_pipeline.py --model-path models/triage_linear_model_trained_demo.json
-```
-
-- Ghi báo cáo JSON/CSV ra `outputs/`:
-
-```powershell
-python scripts/medical_fhe_pipeline.py --write-report
-```
-
-- Benchmark TenSEAL:
-
-```powershell
-python scripts/benchmark_tenseal.py
-```
-
-- Ghi benchmark CSV/JSON ra `outputs/`:
-
-```powershell
-python scripts/benchmark_tenseal.py --write-report
-```
-
-- Train/export model plaintext. Nếu chưa có nhãn thật, script sẽ tạo
-  pseudo-label deterministic chỉ để demo:
-
-```powershell
-python scripts/train_plaintext_linear_model.py --output-model models/triage_linear_model.json
-```
-
-- Train với nhãn thật từ CSV có cột `image,label`:
-
-```powershell
-python scripts/train_plaintext_linear_model.py --labels-csv data/chestxray_sample_labels_demo.csv --output-model models/triage_linear_model.json
-```
-
-- Mở notebook walkthrough:
-
-```powershell
-jupyter lab notebooks/medical_fhe_tenseal_walkthrough.ipynb
-```
-
-- Render scene Manim chất lượng thấp để test nhanh:
-
-```powershell
-manim -c configs/manim.cfg -pql scenes/medical_fhe_pipeline_scene.py MedicalFHEPipeline
-```
-
-- Render video giải thích đầy đủ:
-
-```powershell
-manim -c configs/manim.cfg -pql scenes/fhe4cv_full_explainer.py FHE4CVFullExplainer
-```
-
-- Render Act 2 về FHE-friendly CNN:
-
-```powershell
-.\scripts\render_act2_fhe_cnn.ps1
-```
-
-Script luôn render nội dung đầy đủ theo storyboard, tổng thời lượng khoảng
-70 phút: 15 phút cho scene 1, 20 phút cho scene 2, 10 phút cho scene 3 và
-25 phút cho scene 4. Mỗi phân đoạn gồm visual demonstration và nhiều content
-beats; thời lượng không được tạo bằng cách giữ một khung hình tĩnh.
-
-- Render từng scene Act 2 riêng:
-
-```powershell
-python -m manim -c configs/manim.cfg -ql scenes/02_fhe_cnn/scene_01_relu_barrier.py ReLuBarrier
-python -m manim -c configs/manim.cfg -ql scenes/02_fhe_cnn/scene_02_polynomial_approx.py PolynomialApproximation
-python -m manim -c configs/manim.cfg -ql scenes/02_fhe_cnn/scene_03_naive_cnn_bottleneck.py NaiveCNNBottleneck
-python -m manim -c configs/manim.cfg -ql scenes/02_fhe_cnn/scene_04_multiplexed_conv.py MultiplexedPacking
-```
-
-- Render chất lượng cao:
-
-```powershell
-manim -c configs/manim.cfg -pqh scenes/medical_fhe_pipeline_scene.py MedicalFHEPipeline
-```
-
-- Chạy test:
-
-```powershell
-python -B -m pytest -q -p no:cacheprovider
-```
+Để trộn nhạc nền trong `build_scene.py`, cần cài FFmpeg và thêm `ffmpeg` vào
+`PATH`. Nếu FFmpeg hoặc `assets/audio/bgm.mp3` không tồn tại, script vẫn xuất
+video với audio gốc của Manim.
 
 ## Thiết kế kỹ thuật
 
@@ -212,89 +128,398 @@ notebook + script Python, TenSEAL giúp triển khai ngắn gọn hơn.
 
 FHE hỗ trợ tốt cộng và nhân, nhưng các lớp CV phổ biến như ReLU, max-pooling,
 batch normalization động và các mô hình sâu lớn cần biến đổi đáng kể để tương
-thích FHE. Vì vậy project chọn hướng an toàn cho demo:
+thích FHE. Vì vậy project chọn hướng an toàn với kiến trúc tối giản nhưng đúng bản chất của encrypted inference cho demo:
 
 - ảnh gốc không rời khỏi client;
 - chỉ vector đặc trưng nhỏ được mã hóa;
 - server tính linear score bằng dot product trên ciphertext;
 - sigmoid/threshold cuối cùng thực hiện sau khi client giải mã.
 
-Đây là kiến trúc tối giản nhưng đúng bản chất của encrypted inference.
+## Danh sách scene
 
-## Benchmark và model artifact
+### Act 1 - Math and Crypto
 
-Model được lưu ở `models/triage_linear_model.json` thay vì hard-code trong
-pipeline. Điều này giúp pipeline giống một workflow ML thật hơn:
+| File | Manim class |
+|---|---|
+| `scenes/01_math_crypto/scene_01_he_foundations.py` | `HomomorphicEncryptionFoundations` |
+| `scenes/01_math_crypto/scene_02_ckks_encoding.py` | `CKKSEncodingAndParameters` |
+| `scenes/01_math_crypto/scene_03_ciphertext_operations.py` | `CiphertextOperations` |
+| `scenes/01_math_crypto/scene_04_keys_and_seal_pipeline.py` | `KeysAndSEALPipeline` |
 
-1. train/export model bằng plaintext;
-2. lưu `feature_names`, `weights`, `bias`, `threshold`;
-3. TenSEAL pipeline load artifact đó;
-4. benchmark đo thời gian và sai số encrypted inference.
+### Act 2 - FHE-Friendly CNN
 
-Benchmark hiện đo:
+| File | Manim class |
+|---|---|
+| `scenes/02_fhe_cnn/scene_01_relu_barrier.py` | `ReLuBarrier` |
+| `scenes/02_fhe_cnn/scene_02_polynomial_approx.py` | `PolynomialApproximation` |
+| `scenes/02_fhe_cnn/scene_03_naive_cnn_bottleneck.py` | `NaiveCNNBottleneck` |
+| `scenes/02_fhe_cnn/scene_04_multiplexed_conv.py` | `MultiplexedPacking` |
 
-- preprocessing/scoring plaintext;
-- thời gian tạo CKKS vector;
-- thời gian encrypted dot product;
-- thời gian decrypt;
-- kích thước serialized ciphertext;
-- sai số logit giữa encrypted và plaintext.
+### Act 3 - Practical Demos
 
-Sau khi chạy `--write-report`, các artefact kết quả nằm ở:
+| File | Manim class |
+|---|---|
+| `scenes/03_demos/scene_01_cryptoface_scene.py` | `CryptoFace` |
+| `scenes/03_demos/scene_02_hers.py` | `HERS_System` |
+| `scenes/03_demos/scene_03_PIM.py` | `PrivateImageMatching` |
+| `scenes/03_demos/scene_04_Xray.py` | `XRayTriage` |
 
-- `outputs/medical_fhe_results.csv`
-- `outputs/medical_fhe_results.json`
-- `outputs/benchmark_tenseal.csv`
-- `outputs/benchmark_tenseal_summary.json`
+## Build một scene
 
-Sau khi render Manim, video nằm ở:
+### Cách 1: Dùng `build_scene.py`
 
-- `media/videos/medical_fhe_pipeline_scene/480p15/MedicalFHEPipeline.mp4`
-- `media/videos/fhe4cv_full_explainer/480p15/FHE4CVFullExplainer.mp4`
-- `media/videos/scene_01_relu_barrier/480p15/ReLuBarrier.mp4`
-- `media/videos/scene_02_polynomial_approx/480p15/PolynomialApproximation.mp4`
-- `media/videos/scene_03_naive_cnn_bottleneck/480p15/NaiveCNNBottleneck.mp4`
-- `media/videos/scene_04_multiplexed_conv/480p15/MultiplexedPacking.mp4`
+- Quy trình thực hiện
+  1. Đọc đường dẫn file `.py`;
+  2. Phát hiện Manim Scene class;
+  3. Tìm audio manifest tương ứng;
+  4. Tạo lại narration bằng `generate_audio.py`;
+  5. Render Manim;
+  6. Trộn BGM nếu có;
+  7. Xuất video vào `deliverables/scene_clips/`.
 
-## Kịch bản thuyết trình Manim
+- Các tùy chọn chính:
 
-Scene `MedicalFHEPipeline` minh họa 4 bước:
+  ```text
+  --class-name NAME  Chọn class nếu file có nhiều Scene class
+  --quality l|m|h|k  Chất lượng Manim, mặc định h
+  --no-preview       Không mở video sau khi render
+  --use-cache        Cho phép Manim dùng cache
+  --skip-audio       Không tạo lại narration
+  --skip-bgm         Không trộn BGM
+  --bgm PATH         Dùng file BGM khác
+  --dry-run          Chỉ in các lệnh sẽ chạy
+  ```
 
-1. Hospital/client giữ ảnh X-ray và tạo feature vector.
-2. Client mã hóa feature vector thành CKKS ciphertext.
-3. Cloud server tính `Enc(x) dot w + b` mà không có secret key.
-4. Doctor/client giải mã `Enc(score)` để xem kết quả.
+- Hướng dẫn chạy:
 
-Scene dùng ảnh mẫu trong `data/chestxray_sample/000001-1.png` nếu file tồn tại;
-nếu không, scene tự fallback sang placeholder text.
+  - Khi đang đứng tại project root:
 
-Scene `FHE4CVFullExplainer` phù hợp hơn cho video dài, gồm:
+    ```powershell
+    python scripts/build_scene.py scenes/01_math_crypto/scene_01_he_foundations.py
+    ```
 
-1. vấn đề privacy khi upload ảnh y tế plaintext;
-2. trực giác Homomorphic Encryption;
-3. pipeline TenSEAL/CKKS;
-4. kết quả demo và giới hạn hiện tại.
+  - Khi đang đứng trong thư mục `scripts`:
 
-Act 2 trong `scenes/02_fhe_cnn/` mở rộng phần CNN trên FHE:
+    ```powershell
+    cd scripts
+    python build_scene.py scenes/01_math_crypto/scene_01_he_foundations.py
+    ```
 
-1. `ReLuBarrier`: vì sao ReLU/max cần so sánh và không tương thích trực tiếp
-   với ciphertext CKKS;
-2. `PolynomialApproximation`: thay ReLU bằng đa thức, trade-off giữa sai số và
-   multiplicative depth, cùng ý tưởng imaginary-removing bootstrapping;
-3. `NaiveCNNBottleneck`: minh họa lãng phí SIMD slot và nghẽn cổ chai
-   bootstrapping khi dịch CNN theo cách ngây thơ;
-4. `MultiplexedPacking`: minh họa multiplexed packing, giảm ciphertext
-   rotations và dòng dữ liệu qua ResNet block.
+  - Đường dẫn có thể thay bằng bất kỳ file scene `.py` nào trong `scenes/`:
 
-Nếu có file audio TTS tương ứng trong `assets/audio/`, các scene Act 2 sẽ tự
-gắn âm thanh bằng `self.add_sound(...)`; nếu chưa có audio, scene vẫn render
-bình thường.
+    ```powershell
+    python scripts/build_scene.py scenes/02_fhe_cnn/scene_02_polynomial_approx.py
+      python scripts/build_scene.py scenes/03_demos/scene_04_Xray.py
+    ```
 
-Các khung thời gian trong storyboard là thời lượng mặc định của scene. Nội dung
-được chia thành các visual demonstration, walkthrough, giải thích kỹ thuật,
-ví dụ và recap riêng thay vì kéo dài một khung hình tĩnh.
+  - Kiểm tra quy trình mà không tạo audio hoặc render:
 
-## Nguồn tham chiếu
+    ```powershell
+    python scripts/build_scene.py `
+      scenes/03_demos/scene_01_cryptoface_scene.py `
+      --dry-run
+    ```
+
+  - Render nhanh ở chất lượng thấp:
+
+    ```powershell
+    python scripts/build_scene.py `
+      scenes/02_fhe_cnn/scene_01_relu_barrier.py `
+      --quality l
+    ```
+
+  - Không mở video sau khi render:
+
+    ```powershell
+    python scripts/build_scene.py `
+      scenes/01_math_crypto/scene_02_ckks_encoding.py `
+      --no-preview
+    ```
+
+  - Giữ audio hiện tại, không gọi TTS:
+
+    ```powershell
+    python scripts/build_scene.py `
+      scenes/03_demos/scene_02_hers.py `
+      --skip-audio
+    ```
+
+  - Không trộn nhạc nền:
+
+    ```powershell
+    python scripts/build_scene.py `
+      scenes/03_demos/scene_03_PIM.py `
+      --skip-bgm
+    ```
+
+### Cách 2: Gọi lệnh Manim trực tiếp
+
+Mỗi file scene hiện tại chỉ chứa một Manim Scene class, nên có thể gọi ngắn
+chỉ bằng đường dẫn `.py` (Có thể thay đường dẫn trên bằng bất kỳ file `.py` nào trong ba thư mục Act
+dưới `scenes/`.)
+
+```powershell
+python -m manim -pqh scenes/01_math_crypto/scene_01_he_foundations.py
+```
+
+Để lệnh luôn rõ ràng và không phụ thuộc số class trong file, nên ghi thêm tên
+Manim class:
+
+```powershell
+python -m manim -pqh <path_scene.py> <ManimSceneClass>
+```
+
+Ví dụ:
+
+```powershell
+python -m manim -pqh `
+  scenes/01_math_crypto/scene_01_he_foundations.py `
+  HomomorphicEncryptionFoundations
+```
+
+Để dùng file config của repo:
+
+```powershell
+python -m manim -c configs/manim.cfg -pqh `
+  scenes/01_math_crypto/scene_03_ciphertext_operations.py `
+  CiphertextOperations
+```
+
+Các quality flag thường dùng:
+
+```text
+-pql  preview chất lượng thấp
+-pqm  preview chất lượng trung bình
+-pqh  preview chất lượng cao
+-pqk  preview 4K
+```
+
+Khi gọi Manim trực tiếp, audio phải tồn tại trước nếu scene sử dụng
+`add_sound()`. Cách này không tự gọi TTS và không trộn BGM.
+
+## Tạo audio từ storyboard
+
+File [generate_audio.py](scripts/generate_audio.py)  sẽ đọc phần Lời thoại AI (Audio Voiceover) trong các storyboard Markdown và tạo MP3 theo audio manifest.
+
+Ví dụ:
+- Tạo toàn bộ audio Act 2:
+
+  ```powershell
+  python scripts/generate_audio.py `
+    --manifest scripts/audio_manifest/act2_audio_manifest.json
+  ```
+
+- Chỉ tạo một scene:
+
+  ```powershell
+  python scripts/generate_audio.py `
+    --manifest scripts/audio_manifest/act3_audio_manifest.json `
+    --scene scene_04_xray
+  ```
+
+- Liệt kê scene ID trong manifest:
+
+  ```powershell
+  python scripts/generate_audio.py `
+    --manifest scripts/audio_manifest/act3_audio_manifest.json `
+    --list
+  ```
+
+- Kiểm tra ánh xạ mà không ghi đè MP3:
+
+  ```powershell
+  python scripts/generate_audio.py `
+    --manifest scripts/audio_manifest/act2_audio_manifest.json `
+    --dry-run
+  ```
+
+- Có thể thay giọng và tốc độ:
+
+  ```powershell
+  python scripts/generate_audio.py `
+    --manifest scripts/audio_manifest/act1_audio_manifest.json `
+    --voice en-US-AvaMultilingualNeural `
+    --rate=-10%
+  ```
+
+## Kiểm tra audio manifest
+
+File `validate_audio.py` không có Act mặc định nên cần phải cung cấp `--manifest` hoặc
+`--all`.
+
+Ví dụ:
+
+- Kiểm tra một Act:
+
+  ```powershell
+  python scripts/validate_audio.py `
+    --manifest scripts/audio_manifest/act1_audio_manifest.json
+  ```
+
+- Kiểm tra một scene:
+
+  ```powershell
+  python scripts/validate_audio.py `
+    --manifest scripts/audio_manifest/act3_audio_manifest.json `
+    --scene scene_01_cryptoface_scene
+  ```
+
+- Kiểm tra tất cả manifest và yêu cầu mọi MP3 phải tồn tại:
+
+  ```powershell
+  python scripts/validate_audio.py --all --check-audio
+  ```
+
+- Đối chiếu các clip trong manifest với `add_sound()` hoặc `play_audio()` trong
+scene:
+
+  ```powershell
+  python scripts/validate_audio.py `
+    --manifest scripts/audio_manifest/act2_audio_manifest.json `
+    --check-source-audio-refs
+  ```
+
+Quy trình thực hiện kiểm tra:
+
+- JSON manifest hợp lệ;
+- source `.py` và storyboard `.md` tồn tại;
+- số khối voiceover khớp số nhóm audio;
+- output audio không bị trùng;
+- tổng thời lượng scene khớp manifest;
+- cú pháp Python của scene;
+- chapter và beat count nếu manifest khai báo `beat_methods`;
+- MP3 tồn tại khi dùng `--check-audio`.
+
+## X-ray TenSEAL pipeline
+
+### Chạy plaintext (Không cần TenSEAL)
+
+```powershell
+python scripts/medical_fhe_pipeline.py --plaintext-only
+```
+
+### Chạy CKKS encrypted scoring
+
+- Yêu cầu đã cài TenSEAL:
+
+  ```powershell
+  python scripts/medical_fhe_pipeline.py
+  ```
+
+- Dùng model cụ thể:
+
+  ```powershell
+  python scripts/medical_fhe_pipeline.py `
+    --model-path models/triage_linear_model_trained_demo.json
+  ```
+
+- Ghi báo cáo JSON và CSV:
+
+  ```powershell
+  python scripts/medical_fhe_pipeline.py --write-report
+  ```
+
+- Sau khi chạy `--write-report`, kết quả sẽ được ghi vào:
+
+  ```text
+  outputs/medical_fhe_results.json
+  outputs/medical_fhe_results.csv
+  ```
+
+## Benchmark TenSEAL
+
+- Chạy benchmark cho TenSEAL
+
+  ```powershell
+  python scripts/benchmark_tenseal.py
+  ```
+
+- Ghi báo cáo:
+
+  ```powershell
+  python scripts/benchmark_tenseal.py --write-report
+  ```
+
+- Các chỉ số gồm:
+
+  - thời gian preprocessing và plaintext scoring.
+  - thời gian tạo CKKS ciphertext.
+  - thời gian encrypted dot product.
+  - thời gian decrypted.
+  - kích thước serialized ciphertext.
+  - sai số logit giữa encrypted và plaintext logit.
+
+- Sau khi chạy `--write-report`, kết quả sẽ được ghi vào:
+
+  ```text
+  outputs/benchmark_tenseal.csv
+  outputs/benchmark_tenseal_summary.json
+  ```
+
+## Train model plaintext
+Định dạng labels được mô tả tại [docs/labels_format.md](docs/labels_format.md).
+
+- Tạo model bằng pseudo-label deterministic phục vụ demo:
+
+  ```powershell
+  python scripts/train_plaintext_linear_model.py `
+    --output-model models/triage_linear_model.json
+  ```
+
+- Train bằng nhãn CSV có cột `image,label`:
+
+  ```powershell
+  python scripts/train_plaintext_linear_model.py `
+    --labels-csv data/chestxray_sample_labels_demo.csv `
+    --output-model models/triage_linear_model.json
+  ```
+
+- Chạy thử mà không ghi model:
+
+  ```powershell
+  python scripts/train_plaintext_linear_model.py --dry-run
+  ```
+
+## Notebook
+
+```powershell
+jupyter lab notebooks/medical_fhe_tenseal_walkthrough.ipynb
+```
+
+## Chạy test
+
+```powershell
+python -B -m pytest -q -p no:cacheprovider
+```
+
+## Output
+Tên output sẽ chứa đường dẫn của Act, tên file scene và Manim class để tránh trùng giữa các scene.
+- Manim lưu bản render trung gian trong:
+
+  ```text
+  media/videos/
+  ```
+
+- `build_scene.py` lưu bản cuối cùng trong:
+
+  ```text
+  deliverables/scene_clips/
+  ```
+
+## Lưu ý kỹ thuật
+
+- Storyboard Markdown là nguồn nội dung cho narration và mô tả hoạt ảnh.
+- Act 1 dùng một MP3 dài cho mỗi scene.
+- Act 2 và Act 3 dùng nhiều clip nhỏ vì scene gọi audio ở từng beat.
+- `build_scene.py` mặc định tạo lại audio trước khi render. Dùng
+  `--skip-audio` khi muốn giữ MP3 hiện có.
+- Manim được chạy với `--disable_caching` mặc định trong `build_scene.py` để
+  tránh tái sử dụng video cache không chứa audio mới. Dùng `--use-cache` nếu
+  muốn render nhanh hơn.
+- Secret key chỉ thuộc phía client trong các sơ đồ FHE; cloud chỉ nhận
+  ciphertext và evaluation capabilities cần thiết.
+
+## Nguồn tham khảo
 
 - FHE4CV CVPR 2025 tutorial: https://fhe4cv.github.io/
 - TenSEAL: https://github.com/OpenMined/TenSEAL
